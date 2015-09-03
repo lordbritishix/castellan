@@ -5,3 +5,11 @@ jdk:
 
 after_success:
    - mvn test
+
+notifications:
+ email:
+     recipients:
+         - jim.quitevis@gmail.com
+         - jeffquitevis@yahoo.ca
+     on_success: change
+     on_failure: always
