@@ -5,11 +5,13 @@
   <artifactId>castellan</artifactId>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>Castellan</name>
+  <name>castellan</name>
   <url>git@bitbucket.org:lordbritishix/castellan.gitgit</url>
 
   <modules>
     <module>collector</module>
+    <module>testdatagenerator</module>
+    <module>reportgenerator</module>
   </modules>
 
   <dependencyManagement>
@@ -17,13 +19,7 @@
 	</dependencies>
   </dependencyManagement>  
 
-  <build>
-    <resources>
-  	  <resource>
-  	    <directory>resources</directory>
-  	  </resource>
-    </resources>  
-  
+  <build>  
     <plugins>
       <!-- Set compiler version for build phase -->
       <plugin>

@@ -1,4 +1,4 @@
-package $com.jjdevbros.castellan;
+package com.jjdevbros.castellan.reportgenerator;
 
 /**
  * Hello world!
