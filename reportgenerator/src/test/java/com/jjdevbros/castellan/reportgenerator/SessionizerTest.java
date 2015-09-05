@@ -46,7 +46,7 @@ public class SessionizerTest {
 
         List<EventModel> events = ImmutableList.of(event3, event2, event1, event0);
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 3), LocalDate.of(2015, 9, 4));
-        Map<String, List<EventModel>> session = fixture.getSessionizedEventsForPeriod(events, period);
+        Map<String, List<EventModel>> session = fixture.getSessionizedEventsForPeriodWithoutSpillOver(events, period);
 
         Assert.assertTrue(session.containsKey("Jim"));
         Assert.assertEquals(session.get("Jim"), ImmutableList.of(event1, event2));
@@ -98,7 +98,7 @@ public class SessionizerTest {
 
         List<EventModel> events = ImmutableList.of(event3, event2, event4, event5, event7, event1, event6, event0);
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 3), LocalDate.of(2015, 9, 4));
-        Map<String, List<EventModel>> session = fixture.getSessionizedEventsForPeriod(events, period);
+        Map<String, List<EventModel>> session = fixture.getSessionizedEventsForPeriodWithoutSpillOver(events, period);
 
         Assert.assertTrue(session.containsKey("Jim"));
         Assert.assertEquals(session.get("Jim"), ImmutableList.of(event1, event2, event3, event4, event5, event6));
@@ -124,7 +124,7 @@ public class SessionizerTest {
 
         List<EventModel> events = ImmutableList.of(event2, event1, event0);
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 3), LocalDate.of(2015, 9, 4));
-        Map<String, List<EventModel>> session = fixture.getSessionizedEventsForPeriod(events, period);
+        Map<String, List<EventModel>> session = fixture.getSessionizedEventsForPeriodWithoutSpillOver(events, period);
 
         Assert.assertFalse(session.containsKey("Jim"));
     }
@@ -181,7 +181,7 @@ public class SessionizerTest {
                 ImmutableList.of(event3, event2, event1, event6, event5, event4, event9, event8, event7);
 
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 3), LocalDate.of(2015, 9, 4));
-        Map<String, List<EventModel>> session = fixture.getSessionizedEventsForPeriod(events, period);
+        Map<String, List<EventModel>> session = fixture.getSessionizedEventsForPeriodWithoutSpillOver(events, period);
 
         Assert.assertTrue(session.containsKey("Jim"));
         Assert.assertEquals(session.get("Jim"), ImmutableList.of(event1, event2, event3));
