@@ -10,16 +10,11 @@ import java.util.Map;
  */
 @Data
 @Builder
-public class EventModel {
+public class EventModel implements Comparable {
     /**
      * A unique id identifying an event
      */
     private WindowsLogEventId eventId;
-
-    /**
-     * A user-friendly description of the event
-     */
-    private String eventName;
 
     /**
      * When the event occurred, in UTC
@@ -35,4 +30,15 @@ public class EventModel {
      * Some other information about the event
      */
     private Map rawData;
+
+    @Override
+    public int compareTo(Object o) {
+        if (!(o instanceof  EventModel)) {
+            throw new IllegalArgumentException();
+        }
+
+        EventModel e = (EventModel) o;
+
+        return Long.compare(getTimestamp(), e.getTimestamp());
+    }
 }

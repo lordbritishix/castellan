@@ -1,37 +1,36 @@
 package com.jjdevbros.castellan.common;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 public enum WindowsLogEventId {
     //User successfully logs into the machine
-    LOG_IN(4648),
+    LOG_IN(Pair.of("Login", 4648)),
 
     //User logs off out of the machine
-    LOG_OUT(4647),
+    LOG_OUT(Pair.of("Logout", 4647)),
 
     //User locks the machine explicitly
-    SCREEN_LOCK(4800),
+    SCREEN_LOCK(Pair.of("ScreenLock", 4800)),
 
     //User unlocks the machine explicitly
-    SCREEN_UNLOCK(4801),
+    SCREEN_UNLOCK(Pair.of("ScreenUnlock", 4801)),
 
     //Inactivity due to keyboard / mouse not moved
-    USER_INACTIVE(1000000),
+    USER_INACTIVE(Pair.of("Inactive", 1000000)),
 
     //Transition from inactivity to activity
-    USER_ACTIVE(1000001),
+    USER_ACTIVE(Pair.of("Active", 1000001)),
 
     //User gets disconnected from the network
-    NETWORK_DISCONNECTED(10001),
+    NETWORK_DISCONNECTED(Pair.of("NetworkDisconnected", 10001)),
 
     //User gets connected from the network
-    NETWORK_CONNECTED(10000);
+    NETWORK_CONNECTED(Pair.of("NetworkConnected", 100000));
 
-    private final int id;
+    private final Pair<String, Integer> tuple;
 
-    WindowsLogEventId(int id) {
-        this.id = id;
+    WindowsLogEventId(Pair<String, Integer> tuple) {
+        this.tuple = tuple;
     }
 
-    public int getId() {
-        return id;
-    }
 }
