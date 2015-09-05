@@ -1,5 +1,6 @@
-package com.jjdevbros.castellan.common.model;
+package com.jjdevbros.castellan.common;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.Map;
@@ -8,11 +9,12 @@ import java.util.Map;
  * Created by lordbritishix on 04/09/15.
  */
 @Data
+@Builder
 public class EventModel {
     /**
      * A unique id identifying an event
      */
-    private long eventId;
+    private WindowsLogEventId eventId;
 
     /**
      * A user-friendly description of the event
