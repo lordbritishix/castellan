@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.jjdevbros.castellan.common.EventModel;
 import com.jjdevbros.castellan.common.SessionPeriod;
 import com.jjdevbros.castellan.common.WindowsLogEventId;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +13,10 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class SessionizerTest {
     private Sessionizer fixture;
@@ -48,7 +53,7 @@ public class SessionizerTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 3), LocalDate.of(2015, 9, 4));
         Map<String, List<EventModel>> session = fixture.getSessionizedEventsForPeriodWithoutSpillOver(events, period);
 
-        Assert.assertTrue(session.containsKey("Jim"));
+        assertTrue(session.containsKey("Jim"));
         Assert.assertEquals(session.get("Jim"), ImmutableList.of(event1, event2));
     }
 
@@ -100,7 +105,7 @@ public class SessionizerTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 3), LocalDate.of(2015, 9, 4));
         Map<String, List<EventModel>> session = fixture.getSessionizedEventsForPeriodWithoutSpillOver(events, period);
 
-        Assert.assertTrue(session.containsKey("Jim"));
+        assertTrue(session.containsKey("Jim"));
         Assert.assertEquals(session.get("Jim"), ImmutableList.of(event1, event2, event3, event4, event5, event6));
     }
 
@@ -183,13 +188,75 @@ public class SessionizerTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 3), LocalDate.of(2015, 9, 4));
         Map<String, List<EventModel>> session = fixture.getSessionizedEventsForPeriodWithoutSpillOver(events, period);
 
-        Assert.assertTrue(session.containsKey("Jim"));
+        assertTrue(session.containsKey("Jim"));
         Assert.assertEquals(session.get("Jim"), ImmutableList.of(event1, event2, event3));
 
-        Assert.assertTrue(session.containsKey("Jeff"));
+        assertTrue(session.containsKey("Jeff"));
         Assert.assertEquals(session.get("Jeff"), ImmutableList.of(event4, event5, event6));
 
         Assert.assertFalse(session.containsKey("Jen"));
     }
+
+    @Test
+    public void testSessionizeDailyReturnsDailySessionizedEventList1() {
+        EventModel event0 = EventModel.builder().eventId(WindowsLogEventId.LOG_OUT)
+                .timestamp(Instant.parse("2015-09-02T14:15:30.00Z").toEpochMilli())
+                .userName("Jim")
+                .build();
+
+
+        EventModel event1 = EventModel.builder().eventId(WindowsLogEventId.LOG_IN)
+                .timestamp(Instant.parse("2015-09-03T16:00:00.00Z").toEpochMilli())
+                .userName("Jim")
+                .build();
+
+        EventModel event2 = EventModel.builder().eventId(WindowsLogEventId.LOG_IN)
+                .timestamp(Instant.parse("2015-09-04T16:00:00.00Z").toEpochMilli())
+                .userName("Jim")
+                .build();
+
+        EventModel event3 = EventModel.builder().eventId(WindowsLogEventId.LOG_IN)
+                .timestamp(Instant.parse("2015-09-05T16:00:00.00Z").toEpochMilli())
+                .userName("Jim")
+                .build();
+
+        EventModel event4 = EventModel.builder().eventId(WindowsLogEventId.LOG_IN)
+                .timestamp(Instant.parse("2015-09-06T16:00:00.00Z").toEpochMilli())
+                .userName("Jim")
+                .build();
+
+        EventModel event5 = EventModel.builder().eventId(WindowsLogEventId.LOG_IN)
+                .timestamp(Instant.parse("2015-09-06T16:00:00.00Z").toEpochMilli())
+                .userName("John")
+                .build();
+
+        EventModel event6 = EventModel.builder().eventId(WindowsLogEventId.LOG_OUT)
+                .timestamp(Instant.parse("2015-09-06T19:00:00.00Z").toEpochMilli())
+                .userName("John")
+                .build();
+
+
+        List<EventModel> events = ImmutableList.of(event3, event2, event1, event0, event6, event5, event4);
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 3), LocalDate.of(2015, 9, 8));
+
+        List<Pair<SessionPeriod, Map<String, List<EventModel>>>> session =
+                fixture.getDailySessionizedEventsForPeriodWithoutSpillOver(events, period);
+
+
+        assertThat(session.size(), is(6));
+        assertTrue(session.get(0).getKey().equals(new SessionPeriod(LocalDate.of(2015, 9, 3), LocalDate.of(2015, 9, 3))));
+        assertTrue(session.get(0).getValue().get("Jim").get(0).equals(event1));
+        assertTrue(session.get(1).getKey().equals(new SessionPeriod(LocalDate.of(2015, 9, 4), LocalDate.of(2015, 9, 4))));
+        assertTrue(session.get(1).getValue().get("Jim").get(0).equals(event2));
+        assertTrue(session.get(2).getKey().equals(new SessionPeriod(LocalDate.of(2015, 9, 5), LocalDate.of(2015, 9, 5))));
+        assertTrue(session.get(2).getValue().get("Jim").get(0).equals(event3));
+        assertTrue(session.get(3).getKey().equals(new SessionPeriod(LocalDate.of(2015, 9, 6), LocalDate.of(2015, 9, 6))));
+        assertTrue(session.get(3).getValue().get("Jim").get(0).equals(event4));
+        assertTrue(session.get(3).getValue().get("John").get(0).equals(event5));
+        assertTrue(session.get(3).getValue().get("John").get(1).equals(event6));
+
+
+    }
+
 
 }

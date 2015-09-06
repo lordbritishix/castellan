@@ -1,10 +1,13 @@
 package com.jjdevbros.castellan.common;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import org.junit.*;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 public class SessionPeriodTest {
@@ -59,4 +62,10 @@ public class SessionPeriodTest {
         long time = LocalDateTime.of(2015, 9, 6, 0, 0, 0).toInstant(ZoneOffset.UTC).toEpochMilli();
         assertFalse(fixture.isInSession(time));
     }
+
+    @Test
+    public void testGetDurationReturnsCorrectDuration() {
+        assertThat(fixture.getDuration().getDays(), is(5));
+    }
+
 }

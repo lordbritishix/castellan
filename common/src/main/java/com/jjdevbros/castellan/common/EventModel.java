@@ -2,6 +2,7 @@ package com.jjdevbros.castellan.common;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import java.util.Map;
  */
 @Data
 @Builder
+@EqualsAndHashCode
 public class EventModel implements Comparable {
     /**
      * A unique id identifying an event
