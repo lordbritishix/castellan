@@ -19,11 +19,12 @@ public class Sessionizer {
      * for the definition of a session
      */
     @VisibleForTesting
-    Map<String, List<EventModel>> getSessionizedEventsForPeriodWithoutSpillOver(List<EventModel> events,
+    Map<String, List<NormalizedEventModel>> getSessionizedEventsForPeriodWithoutSpillOver(List<EventModel> events,
                                                                                        SessionPeriod sessionPeriod) {
         return events.stream().filter(e -> sessionPeriod.isInSession(e.getTimestamp()))
                                 .sorted()
-                                .collect(Collectors.groupingBy(p -> p.getUserName()));
+                                .map(q -> normalizeEvent(q))
+                                .collect(Collectors.groupingBy(p -> p.getEventModel().getUserName()));
     }
 
     /**
@@ -32,28 +33,14 @@ public class Sessionizer {
      * Session Period, Map< User Name, List<Events> >
      *
      */
-    public List<Pair<SessionPeriod, Map<String, List<EventModel>>>>
-        getDailySessionizedEventsForPeriodWithoutSpillOver(List<EventModel> events, SessionPeriod sessionPeriod) {
+    public List<Pair<SessionPeriod, Map<String, List<NormalizedEventModel>>>>
+        sessionizeAndNormalize(List<EventModel> events, SessionPeriod sessionPeriod) {
         SessionPeriodSpliterator spliterator = new SessionPeriodSpliterator();
-        List<SessionPeriod> splits = spliterator.splitDaily(sessionPeriod);
 
+        List<SessionPeriod> splits = spliterator.splitDaily(sessionPeriod);
         return splits.stream().map(s ->
                 Pair.of(s, getSessionizedEventsForPeriodWithoutSpillOver(events, s))).collect(Collectors.toList());
     }
-
-    public List<NormalizedEventModel> normalizeEvent(List<EventModel> events) {
-        return events.stream().map(e -> normalizeEvent(e)).collect(Collectors.toList());
-    }
-
-    /**
-     * Login / Logout is valid any time
-     * ScreenLock / ScreenUnlock is only valid if it was preceeded by LogIn
-     * Idle / NotIdle is only valid if it was preceeded by ScreenUnlock
-     */
-    private void cleanupEvent(int indexOfEvent, List<EventModel> event) {
-
-    }
-
 
     /**
      * Normalization procedure:
@@ -70,7 +57,8 @@ public class Sessionizer {
      *
      * Tag invalid data
      */
-    private NormalizedEventModel normalizeEvent(EventModel eventModel) {
+    @VisibleForTesting
+    NormalizedEventModel normalizeEvent(EventModel eventModel) {
         NormalizedEventModel.NormalizedEventModelBuilder builder = NormalizedEventModel.builder();
         builder.eventModel(eventModel);
 
