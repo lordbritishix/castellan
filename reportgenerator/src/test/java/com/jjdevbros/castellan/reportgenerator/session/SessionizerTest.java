@@ -1,4 +1,4 @@
-package com.jjdevbros.castellan.reportgenerator;
+package com.jjdevbros.castellan.reportgenerator.session;
 
 import com.google.common.collect.ImmutableList;
 import com.jjdevbros.castellan.common.EventModel;
@@ -6,6 +6,7 @@ import com.jjdevbros.castellan.common.NormalizedEventId;
 import com.jjdevbros.castellan.common.NormalizedEventModel;
 import com.jjdevbros.castellan.common.SessionPeriod;
 import com.jjdevbros.castellan.common.WindowsLogEventId;
+import com.jjdevbros.castellan.reportgenerator.session.Sessionizer;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Before;

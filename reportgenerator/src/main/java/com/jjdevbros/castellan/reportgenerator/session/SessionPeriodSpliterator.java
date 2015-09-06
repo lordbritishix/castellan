@@ -1,4 +1,4 @@
-package com.jjdevbros.castellan.reportgenerator;
+package com.jjdevbros.castellan.reportgenerator.session;
 
 import com.google.common.collect.Lists;
 import com.jjdevbros.castellan.common.SessionPeriod;

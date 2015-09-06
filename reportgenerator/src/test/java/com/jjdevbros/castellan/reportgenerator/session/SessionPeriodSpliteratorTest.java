@@ -1,6 +1,7 @@
-package com.jjdevbros.castellan.reportgenerator;
+package com.jjdevbros.castellan.reportgenerator.session;
 
 import com.jjdevbros.castellan.common.SessionPeriod;
+import com.jjdevbros.castellan.reportgenerator.session.SessionPeriodSpliterator;
 import org.junit.Before;
 import org.junit.Test;
 

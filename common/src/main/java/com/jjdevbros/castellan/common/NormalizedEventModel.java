@@ -8,7 +8,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class NormalizedEventModel {
+public class NormalizedEventModel implements Comparable {
     /**
      * Normalized event id
      */
@@ -23,4 +23,16 @@ public class NormalizedEventModel {
      * If it is marked as invalid in the context of the session
      */
     private boolean invalid;
+
+
+    @Override
+    public int compareTo(Object o) {
+        if (!(o instanceof  NormalizedEventModel)) {
+            throw new UnsupportedOperationException();
+        }
+
+        NormalizedEventModel e = (NormalizedEventModel) o;
+
+        return Long.compare(eventModel.getTimestamp(), e.getEventModel().getTimestamp());
+    }
 }

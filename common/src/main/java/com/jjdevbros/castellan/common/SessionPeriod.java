@@ -7,12 +7,11 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
 @EqualsAndHashCode
 public class SessionPeriod {
-    private static final ZoneId UTC = ZoneId.of("UTC");
     @Getter
     private LocalDateTime startTime;
 
@@ -31,7 +30,7 @@ public class SessionPeriod {
      * It is less than the end time
      */
     public boolean isInSession(long time) {
-        LocalDateTime compare = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), UTC);
+        LocalDateTime compare = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneOffset.UTC);
 
         return compare.isAfter(startTime.minus(1L, ChronoUnit.MILLIS)) && compare.isBefore(endTime);
     }

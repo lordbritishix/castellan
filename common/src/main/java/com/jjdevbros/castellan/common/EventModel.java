@@ -36,7 +36,7 @@ public class EventModel implements Comparable {
     @Override
     public int compareTo(Object o) {
         if (!(o instanceof  EventModel)) {
-            throw new IllegalArgumentException();
+            throw new UnsupportedOperationException();
         }
 
         EventModel e = (EventModel) o;
