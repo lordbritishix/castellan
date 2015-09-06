@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -21,12 +23,27 @@ public class UserReport {
     /**
      * Time the user started working
      */
-    private long startTime;
+    private Instant startTime;
 
     /**
      * Time the user finished working
      */
-    private long endTime;
+    private Instant endTime;
+
+    /**
+     * Duration of inactivity
+     */
+    private Duration inactivityDuration;
+
+    /**
+     * Duration of activity
+     */
+    private Duration activityDuration;
+
+    /**
+     * Duration between end time and start time
+     */
+    private Duration workDuration;
 
     /**
      * List of inactive periods for this user

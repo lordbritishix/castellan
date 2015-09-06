@@ -8,8 +8,12 @@ import com.jjdevbros.castellan.common.NormalizedEventModel;
 import com.jjdevbros.castellan.common.SessionPeriod;
 import com.jjdevbros.castellan.reportgenerator.report.UserReport;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 /**
@@ -20,11 +24,21 @@ import java.util.stream.Collectors;
 public class UserReportGenerator {
     public UserReport generateUserReport(String userName, List<NormalizedEventModel> events, SessionPeriod period) {
         UserReport.UserReportBuilder builder = UserReport.builder();
-        builder.userName(userName)
-                .startTime(computeStartTime(events))
-                .endTime(computeEndTime(events, period.getEndTime().toInstant(ZoneOffset.UTC).toEpochMilli()));
+        Instant startTime = Instant.ofEpochMilli(computeStartTime(events));
+        Instant endTime = Instant.ofEpochMilli(
+                computeEndTime(events, period.getEndTime().toInstant(ZoneOffset.UTC).toEpochMilli()));
+        List<InactivePeriod> inactivePeriods = getInactivityActivityPeriods(events);
+        Duration workDuration = Duration.between(startTime, endTime);
+        Duration inactivityDuration = computeInactivityDuration(inactivePeriods);
 
-        return UserReport.builder().build();
+        return builder.userName(userName)
+                .startTime(startTime)
+                .endTime(endTime)
+                .inactivePeriods(inactivePeriods)
+                .inactivityDuration(inactivityDuration)
+                .workDuration(workDuration)
+                .activityDuration(workDuration.minus(inactivityDuration))
+                .build();
     }
 
     /**
@@ -68,13 +82,40 @@ public class UserReportGenerator {
     }
 
     /**
-     * Returns a list of inactivity periods from the list.
+     * Returns a list of periods of activity from the list.
      *
-     * Inactivity period is the difference between the time of the Inactive Event and the time of the last Active Event
-     * that occured prior to the Inactive Event
+     * Activity period is defined as the period between the first active event followed by the first inactive event
+     * after the active event
      */
-    List<InactivePeriod> computeInactivityPeriods(List<NormalizedEventModel> events) {
-        return Lists.newArrayList();
+    @VisibleForTesting
+    List<InactivePeriod> getInactivityActivityPeriods(List<NormalizedEventModel> events) {
+        List<InactivePeriod> inactivePeriods = Lists.newArrayList();
+        Stack<NormalizedEventModel> stack = new Stack<>();
+        for (NormalizedEventModel event : events) {
+            if ((event.getEventId() == NormalizedEventId.INACTIVE)  && stack.isEmpty()) {
+                stack.push(event);
+            }
+            else if ((event.getEventId() == NormalizedEventId.ACTIVE) && !stack.isEmpty()) {
+                NormalizedEventModel inactive = stack.pop();
+                inactivePeriods.add(new InactivePeriod(
+                    LocalDateTime.ofInstant(Instant.ofEpochMilli(inactive.getEventModel().getTimestamp()),
+                            ZoneOffset.UTC),
+                    LocalDateTime.ofInstant(Instant.ofEpochMilli(event.getEventModel().getTimestamp()),
+                            ZoneOffset.UTC)));
+            }
+
+        }
+
+        return inactivePeriods;
     }
 
+    @VisibleForTesting
+    Duration computeInactivityDuration(List<InactivePeriod> inactivePeriods) {
+        long sumOfInactivePeriodsInMillis =
+                inactivePeriods.stream()
+                        .map(e -> Duration.between(e.getStart(), e.getEnd()))
+                        .mapToLong(d -> d.toMillis()).summaryStatistics().getSum();
+
+        return Duration.ofMillis(sumOfInactivePeriodsInMillis);
+    }
 }

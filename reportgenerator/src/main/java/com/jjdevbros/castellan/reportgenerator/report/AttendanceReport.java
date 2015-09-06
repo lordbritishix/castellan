@@ -15,7 +15,7 @@ import java.util.UUID;
 @Builder
 public class AttendanceReport {
     private UUID reportId;
-    
+
     private long reportedAt;
 
     private SessionPeriod period;
