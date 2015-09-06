@@ -1,6 +1,7 @@
 package com.jjdevbros.castellan.reportgenerator.report;
 
 import com.jjdevbros.castellan.common.InactivePeriod;
+import com.jjdevbros.castellan.common.SessionPeriod;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
@@ -14,7 +15,9 @@ import java.util.List;
  */
 @Data
 @Builder
-public class UserReport {
+public class UserReport implements Comparable {
+    private SessionPeriod period;
+
     /**
      * Name of the user
      */
@@ -50,4 +53,14 @@ public class UserReport {
      */
     @Singular
     private List<InactivePeriod> inactivePeriods;
+
+    @Override
+    public int compareTo(Object o) {
+        if (!(o instanceof UserReport)) {
+            throw new UnsupportedOperationException();
+        }
+
+        UserReport u = (UserReport) o;
+        return startTime.compareTo(u.getStartTime());
+    }
 }

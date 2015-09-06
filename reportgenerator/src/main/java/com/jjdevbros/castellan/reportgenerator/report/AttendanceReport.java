@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -16,10 +18,10 @@ import java.util.UUID;
 public class AttendanceReport {
     private UUID reportId;
 
-    private long reportedAt;
+    private Instant reportedGeneratedAt;
 
     private SessionPeriod period;
 
     @Singular
-    private List<UserReport> userReports;
+    private Map<SessionPeriod, List<UserReport>> userReports;
 }

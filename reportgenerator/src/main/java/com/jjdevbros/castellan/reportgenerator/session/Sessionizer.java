@@ -13,21 +13,6 @@ import java.util.stream.Collectors;
 
 public class Sessionizer {
     /**
-     * Sessionizes a list of events (without spill-over)
-     *
-     * See https://docs.google.com/spreadsheets/d/1EmQpUtoFDs72c8ZHn4GvC8PnoaedbSv1n9adUEBUqjU/edit#gid=1409220163
-     * for the definition of a session
-     */
-    @VisibleForTesting
-    Map<String, List<NormalizedEventModel>> getSessionizedEventsForPeriodWithoutSpillOver(List<EventModel> events,
-                                                                                       SessionPeriod sessionPeriod) {
-        return events.stream().filter(e -> sessionPeriod.isInSession(e.getTimestamp()))
-                                .sorted()
-                                .map(q -> normalizeEvent(q))
-                                .collect(Collectors.groupingBy(p -> p.getEventModel().getUserName()));
-    }
-
-    /**
      * Produces a daily-grouped sessionized list of events:
      *
      * Session Period, Map< User Name, List<Events> >
@@ -40,6 +25,20 @@ public class Sessionizer {
         List<SessionPeriod> splits = spliterator.splitDaily(sessionPeriod);
         return splits.stream().map(s ->
                 Pair.of(s, getSessionizedEventsForPeriodWithoutSpillOver(events, s))).collect(Collectors.toList());
+    }
+
+    /**
+     * Sessionizes a list of events (without spill-over)
+     *
+     * See https://docs.google.com/spreadsheets/d/1EmQpUtoFDs72c8ZHn4GvC8PnoaedbSv1n9adUEBUqjU/edit#gid=1409220163
+     * for the definition of a session
+     */
+    public Map<String, List<NormalizedEventModel>>
+        getSessionizedEventsForPeriodWithoutSpillOver(List<EventModel> events, SessionPeriod sessionPeriod) {
+        return events.stream().filter(e -> sessionPeriod.isInSession(e.getTimestamp()))
+                .sorted()
+                .map(q -> normalizeEvent(q))
+                .collect(Collectors.groupingBy(p -> p.getEventModel().getUserName()));
     }
 
     /**

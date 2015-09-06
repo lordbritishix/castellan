@@ -34,6 +34,7 @@ public class UserReportGenerator {
         return builder.userName(userName)
                 .startTime(startTime)
                 .endTime(endTime)
+                .period(period)
                 .inactivePeriods(inactivePeriods)
                 .inactivityDuration(inactivityDuration)
                 .workDuration(workDuration)

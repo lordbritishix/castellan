@@ -11,7 +11,7 @@ import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
 @EqualsAndHashCode
-public class SessionPeriod {
+public class SessionPeriod implements Comparable {
     @Getter
     private LocalDateTime startTime;
 
@@ -37,5 +37,16 @@ public class SessionPeriod {
 
     public Period getDuration() {
         return Period.between(startTime.toLocalDate(), endTime.toLocalDate());
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (!(o instanceof  SessionPeriod)) {
+            throw new UnsupportedOperationException();
+        }
+
+        SessionPeriod e = (SessionPeriod) o;
+
+        return startTime.compareTo(e.getStartTime());
     }
 }
