@@ -1,10 +1,12 @@
 package com.jjdevbros.castellan.reportgenerator.generator;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.jjdevbros.castellan.common.InactivePeriod;
 import com.jjdevbros.castellan.common.NormalizedEventId;
 import com.jjdevbros.castellan.common.NormalizedEventModel;
+import com.jjdevbros.castellan.common.NormalizedSession;
 import com.jjdevbros.castellan.common.SessionPeriod;
 import com.jjdevbros.castellan.reportgenerator.report.UserReport;
 
@@ -22,8 +24,15 @@ import java.util.stream.Collectors;
  * Generates a user report
  */
 public class UserReportGenerator {
-    public UserReport generateUserReport(String userName, List<NormalizedEventModel> events, SessionPeriod period) {
-        UserReport.UserReportBuilder builder = UserReport.builder();
+    public UserReport generateUserReport(String userName, NormalizedSession events, SessionPeriod period) {
+        UserReport.UserReportBuilder builder = UserReport.builder()
+                .userName(userName)
+                .period(period);
+
+        if (events.isHasErrors()) {
+            return builder.hasErrors(true).build();
+        }
+
         Instant startTime = Instant.ofEpochMilli(computeStartTime(events));
         Instant endTime = Instant.ofEpochMilli(
                 computeEndTime(events, period.getEndTime().toInstant(ZoneOffset.UTC).toEpochMilli()));
@@ -31,10 +40,9 @@ public class UserReportGenerator {
         Duration workDuration = Duration.between(startTime, endTime);
         Duration inactivityDuration = computeInactivityDuration(inactivePeriods);
 
-        return builder.userName(userName)
+        return builder
                 .startTime(startTime)
                 .endTime(endTime)
-                .period(period)
                 .inactivePeriods(inactivePeriods)
                 .inactivityDuration(inactivityDuration)
                 .workDuration(workDuration)
@@ -47,8 +55,12 @@ public class UserReportGenerator {
      * Returns -1 if there is no Active event in the list of events
      */
     @VisibleForTesting
-    long computeStartTime(List<NormalizedEventModel> events) {
-        return events.stream()
+    long computeStartTime(NormalizedSession session) {
+        if (session.isHasErrors()) {
+            return -1;
+        }
+
+        return session.getEvents().stream()
                 .sorted()
                 .filter(e -> e.getEventId().equals(NormalizedEventId.ACTIVE))
                 .findFirst()
@@ -61,8 +73,12 @@ public class UserReportGenerator {
      * Time of the first "Inactive" event after the last "Active" event in the list of events
      */
     @VisibleForTesting
-    long computeEndTime(List<NormalizedEventModel> events, long defaultEndTimeIfValid) {
-        List<NormalizedEventModel> baseEvents = events.stream().sorted().collect(Collectors.toList());
+    long computeEndTime(NormalizedSession events, long defaultEndTimeIfValid) {
+        if (events.isHasErrors()) {
+            return -1;
+        }
+
+        List<NormalizedEventModel> baseEvents = events.getEvents().stream().sorted().collect(Collectors.toList());
 
         List<NormalizedEventModel> activeEvents = baseEvents.stream()
                 .filter(e -> e.getEventId().equals(NormalizedEventId.ACTIVE))
@@ -89,10 +105,14 @@ public class UserReportGenerator {
      * after the active event
      */
     @VisibleForTesting
-    List<InactivePeriod> getInactivityActivityPeriods(List<NormalizedEventModel> events) {
+    List<InactivePeriod> getInactivityActivityPeriods(NormalizedSession events) {
+        if (events.isHasErrors()) {
+            return ImmutableList.of();
+        }
+
         List<InactivePeriod> inactivePeriods = Lists.newArrayList();
         Stack<NormalizedEventModel> stack = new Stack<>();
-        for (NormalizedEventModel event : events) {
+        for (NormalizedEventModel event : events.getEvents()) {
             if ((event.getEventId() == NormalizedEventId.INACTIVE)  && stack.isEmpty()) {
                 stack.push(event);
             }

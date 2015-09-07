@@ -1,16 +1,22 @@
 package com.jjdevbros.castellan.reportgenerator.session;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
+import com.jjdevbros.castellan.common.Constants;
 import com.jjdevbros.castellan.common.EventModel;
 import com.jjdevbros.castellan.common.NormalizedEventId;
 import com.jjdevbros.castellan.common.NormalizedEventModel;
+import com.jjdevbros.castellan.common.NormalizedSession;
 import com.jjdevbros.castellan.common.SessionPeriod;
+import com.jjdevbros.castellan.reportgenerator.validator.Validator;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class Sessionizer {
     /**
      * Produces a daily-grouped sessionized list of events:
@@ -18,27 +24,56 @@ public class Sessionizer {
      * Session Period, Map< User Name, List<Events> >
      *
      */
-    public List<Pair<SessionPeriod, Map<String, List<NormalizedEventModel>>>>
-        sessionizeAndNormalize(List<EventModel> events, SessionPeriod sessionPeriod) {
+    public List<Pair<SessionPeriod, List<NormalizedSession>>>
+                    sessionizeAndNormalize(List<EventModel> events, SessionPeriod sessionPeriod) {
         SessionPeriodSpliterator spliterator = new SessionPeriodSpliterator();
 
         List<SessionPeriod> splits = spliterator.splitDaily(sessionPeriod);
-        return splits.stream().map(s ->
-                Pair.of(s, getSessionizedEventsForPeriodWithoutSpillOver(events, s))).collect(Collectors.toList());
+        return splits.stream()
+                .map(s -> Pair.of(s, getSessionizedEventsForPeriodWithoutSpillOver(events, s)))
+                .collect(Collectors.toList());
     }
 
     /**
-     * Sessionizes a list of events (without spill-over)
+     * Sessionizes an event:
+     *
+     * 1. Filters for events that are within session
+     * 2. Normalizes the events
+     * 3. Groups the events by user
      *
      * See https://docs.google.com/spreadsheets/d/1EmQpUtoFDs72c8ZHn4GvC8PnoaedbSv1n9adUEBUqjU/edit#gid=1409220163
      * for the definition of a session
      */
-    public Map<String, List<NormalizedEventModel>>
+    public List<NormalizedSession>
         getSessionizedEventsForPeriodWithoutSpillOver(List<EventModel> events, SessionPeriod sessionPeriod) {
-        return events.stream().filter(e -> sessionPeriod.isInSession(e.getTimestamp()))
+
+        Map<String, List<EventModel>> processedEvents =
+            events.stream()
+                .filter(e -> sessionPeriod.isInSession(e.getTimestamp()))
+                .filter(e -> Constants.SUPPORTED_STATES.contains(e.getEventId()))
                 .sorted()
-                .map(q -> normalizeEvent(q))
-                .collect(Collectors.groupingBy(p -> p.getEventModel().getUserName()));
+                .collect(Collectors.groupingBy(p -> p.getUserName()));
+
+        List<NormalizedSession> normalizedSessions = Lists.newArrayList();
+
+        Validator validator = new Validator();
+        for (String key : processedEvents.keySet()) {
+            List<EventModel> event = processedEvents.get(key);
+
+            boolean isValid = validator.isValid(event);
+
+            if (!isValid) {
+                log.warn("Invalid event detected for: {}", event.toString());
+            }
+
+            normalizedSessions.add(NormalizedSession.builder()
+                    .hasErrors(!isValid)
+                    .events(event.stream().map(e -> normalizeEvent(e)).collect(Collectors.toList()))
+                    .userName(key).build());
+
+        }
+
+        return normalizedSessions;
     }
 
     /**

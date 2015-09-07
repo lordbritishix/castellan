@@ -49,6 +49,11 @@ public class UserReport implements Comparable {
     private Duration workDuration;
 
     /**
+     * Flag indicating errors in the data
+     */
+    private boolean hasErrors;
+
+    /**
      * List of inactive periods for this user
      */
     @Singular

@@ -1,9 +1,11 @@
 package com.jjdevbros.castellan.reportgenerator.report;
 
 import com.jjdevbros.castellan.common.SessionPeriod;
+import com.jjdevbros.castellan.reportgenerator.serializer.AttendanceReportSerializer;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.time.Instant;
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.UUID;
  */
 @Data
 @Builder
+@JsonSerialize(using = AttendanceReportSerializer.class)
 public class AttendanceReport {
     private UUID reportId;
 

@@ -30,6 +30,52 @@ public class AttendanceReportGeneratorTest {
     }
 
     @Test
+    public void generateAttendanceReportReturnsCorrectReportForInvalidEvents1() {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-02T08:15:30.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-02T08:15:35.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-02T18:15:40.00Z", "Jim")
+        );
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
+
+        AttendanceReport attendanceReport = fixture.generateAttendanceReport(events, period);
+
+        assertThat(attendanceReport.getUserReports().size(), is(1));
+
+        List<UserReport> userReports =
+                getUserReportsForSingleDay(attendanceReport.getUserReports(), LocalDate.of(2015, 9, 2));
+        assertThat(userReports.get(0).isHasErrors(), is(true));
+    }
+
+    @Test
+    public void generateAttendanceReportReturnsCorrectReportForInvalidEvents2() {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-02T08:15:30.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T09:15:30.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.USER_ACTIVE, "2015-09-02T10:15:30.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-02T18:15:40.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-03T08:15:30.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-03T08:15:35.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.USER_ACTIVE, "2015-09-03T18:15:40.00Z", "Jim"));
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 3));
+
+        AttendanceReport attendanceReport = fixture.generateAttendanceReport(events, period);
+
+        assertThat(attendanceReport.getUserReports().size(), is(2));
+
+        List<UserReport> userReportDay1 =
+                getUserReportsForSingleDay(attendanceReport.getUserReports(), LocalDate.of(2015, 9, 2));
+        assertThat(userReportDay1.get(0).isHasErrors(), is(true));
+
+        List<UserReport> userReportDay2 =
+                getUserReportsForSingleDay(attendanceReport.getUserReports(), LocalDate.of(2015, 9, 3));
+        assertThat(userReportDay2.get(0).isHasErrors(), is(true));
+    }
+
+
+    @Test
     public void generateAttendanceReportReturnsCorrectReportForHappyCase1() {
         List<EventModel> events = ImmutableList.of(
             buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-02T08:15:30.00Z", "Jim"),
