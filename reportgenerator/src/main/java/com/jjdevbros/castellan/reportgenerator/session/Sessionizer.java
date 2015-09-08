@@ -1,5 +1,10 @@
 package com.jjdevbros.castellan.reportgenerator.session;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.jjdevbros.castellan.common.Constants;
@@ -9,13 +14,8 @@ import com.jjdevbros.castellan.common.NormalizedEventModel;
 import com.jjdevbros.castellan.common.NormalizedSession;
 import com.jjdevbros.castellan.common.SessionPeriod;
 import com.jjdevbros.castellan.common.WindowsLogEventId;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class Sessionizer {
@@ -38,17 +38,15 @@ public class Sessionizer {
      * Sessionizes an event:
      *
      * 1. Filters for events that are within session
-     * 2. Normalizes the events
-     * 3. Groups the events by user
-     *
-     * See https://docs.google.com/spreadsheets/d/1EmQpUtoFDs72c8ZHn4GvC8PnoaedbSv1n9adUEBUqjU/edit#gid=1409220163
-     * for the definition of a session
+     * 2. Clean up events pass 1 (Events between the inactive - active period are cleaned up)
+     * 3. Clean up events pass 2
+     * 4. Normalizes the events
+     * 5. Groups the events by user
      */
     public List<NormalizedSession>
         getSessionizedEventsForPeriodWithoutSpillOver(List<EventModel> events, SessionPeriod sessionPeriod) {
 
-        List<EventModel> cleanedUpEvents = cleanupEventsBetween(events,
-                WindowsLogEventId.SCREEN_LOCK, WindowsLogEventId.SCREEN_UNLOCK);
+        List<EventModel> cleanedUpEvents = cleanUpEvents(events);
 
         Map<String, List<EventModel>> processedEvents =
                 cleanedUpEvents.stream()
@@ -71,6 +69,22 @@ public class Sessionizer {
         }
 
         return normalizedSessions;
+    }
+
+    private List<EventModel> cleanUpEvents(List<EventModel> events) {
+        //Events between the inactive - active period are cleaned up
+        List<EventModel> cleanedUpEvents = cleanupEventsBetween(events,
+                WindowsLogEventId.SCREEN_LOCK, WindowsLogEventId.SCREEN_UNLOCK);
+
+        cleanedUpEvents = cleanupEventsBetween(cleanedUpEvents,
+                WindowsLogEventId.LOG_OUT, WindowsLogEventId.LOG_IN);
+
+        cleanedUpEvents = cleanupEventsBetween(cleanedUpEvents,
+                WindowsLogEventId.SCREENSAVER_ACTIVE, WindowsLogEventId.SCREENSAVER_INACTIVE);
+
+        //Duplicate events are cleaned up
+
+        return cleanedUpEvents.stream().distinct().collect(Collectors.toList());
     }
 
     /**

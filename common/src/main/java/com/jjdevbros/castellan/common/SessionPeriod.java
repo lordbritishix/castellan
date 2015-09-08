@@ -49,4 +49,15 @@ public class SessionPeriod implements Comparable {
 
         return startTime.compareTo(e.getStartTime());
     }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(startTime.toString());
+        builder.append(" - ");
+        builder.append(endTime.toString());
+
+        return builder.toString();
+    }
 }

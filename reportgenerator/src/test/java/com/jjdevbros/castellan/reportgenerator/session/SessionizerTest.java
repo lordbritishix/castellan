@@ -1,5 +1,11 @@
 package com.jjdevbros.castellan.reportgenerator.session;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.*;
 import com.google.common.collect.ImmutableList;
 import com.jjdevbros.castellan.common.EventModel;
 import com.jjdevbros.castellan.common.NormalizedEventId;
@@ -7,20 +13,9 @@ import com.jjdevbros.castellan.common.NormalizedEventModel;
 import com.jjdevbros.castellan.common.NormalizedSession;
 import com.jjdevbros.castellan.common.SessionPeriod;
 import com.jjdevbros.castellan.common.WindowsLogEventId;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class SessionizerTest {
     private Sessionizer fixture;
@@ -151,6 +146,59 @@ public class SessionizerTest {
 
         assertEquals(session.get(0).getEvents().stream().map(e -> e.getEventModel()).collect(Collectors.toList()),
                 ImmutableList.of(event1, event2, event3, event4, event5, event6));
+    }
+
+    @Test
+    public void testSessionizeCleansUpDuplicateEvents() {
+        List<EventModel> events = ImmutableList.of(
+                createEvent(WindowsLogEventId.LOG_IN, "2015-09-03T08:00:00.00Z", "Jim"),
+                createEvent(WindowsLogEventId.LOG_IN, "2015-09-03T08:00:00.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-03T09:00:00.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-03T09:00:00.00Z", "Jim"),
+                createEvent(WindowsLogEventId.LOG_OUT, "2015-09-03T18:00:00.00Z", "Jim"),
+                createEvent(WindowsLogEventId.LOG_OUT, "2015-09-03T18:00:00.00Z", "Jim")
+        );
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 3), LocalDate.of(2015, 9, 3));
+        List<NormalizedSession> session =
+                fixture.getSessionizedEventsForPeriodWithoutSpillOver(events, period);
+
+        assertThat(session.get(0).getEvents().size(), is(4));
+        assertEquals(session.get(0).getEvents().stream().map(e -> e.getEventModel()).collect(Collectors.toList()),
+                ImmutableList.of(events.get(0), events.get(2), events.get(3), events.get(4)));
+    }
+
+
+    @Test
+    public void testSessionizeReturnsCleanedUpEventsBetweenLogOutLogin() {
+        List<EventModel> events = ImmutableList.of(
+                createEvent(WindowsLogEventId.LOG_OUT, "2015-09-03T08:00:00.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-03T08:10:00.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-03T08:20:00.00Z", "Jim"),
+                createEvent(WindowsLogEventId.LOG_IN, "2015-09-03T08:30:00.00Z", "Jim")
+        );
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 3), LocalDate.of(2015, 9, 3));
+        List<NormalizedSession> session =
+                fixture.getSessionizedEventsForPeriodWithoutSpillOver(events, period);
+
+        assertThat(session.get(0).getEvents().size(), is(2));
+        assertEquals(session.get(0).getEvents().stream().map(e -> e.getEventModel()).collect(Collectors.toList()),
+                ImmutableList.of(events.get(0), events.get(3)));
+    }
+
+    @Test
+    public void testSessionizeDoesNotCleanUpEventsAfterLogoutOnly() {
+        List<EventModel> events = ImmutableList.of(
+                createEvent(WindowsLogEventId.LOG_OUT, "2015-09-03T08:00:00.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-03T08:10:00.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-03T08:20:00.00Z", "Jim")
+        );
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 3), LocalDate.of(2015, 9, 3));
+        List<NormalizedSession> session =
+                fixture.getSessionizedEventsForPeriodWithoutSpillOver(events, period);
+
+        assertThat(session.get(0).getEvents().size(), is(3));
+        assertEquals(session.get(0).getEvents().stream().map(e -> e.getEventModel()).collect(Collectors.toList()),
+                ImmutableList.of(events.get(0), events.get(1), events.get(2)));
     }
 
     @Test

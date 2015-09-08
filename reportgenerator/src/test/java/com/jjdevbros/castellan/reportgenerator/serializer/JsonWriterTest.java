@@ -164,10 +164,7 @@ public class JsonWriterTest {
         assertThat(userReport.get("activityDuration").asText(), is("0:00:00"));
         assertThat(userReport.get("workDuration").asText(), is("0:00:00"));
         assertThat(userReport.get("hasErrors").asBoolean(), is(true));
-
     }
-
-
 
     private EventModel buildTestEvent(WindowsLogEventId eventId, String timestamp, String username) {
         return EventModel.builder().eventId(eventId)

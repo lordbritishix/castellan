@@ -21,7 +21,6 @@
 
     <modules>
         <module>collector</module>
-        <module>testdatagenerator</module>
         <module>reportgenerator</module>
         <module>common</module>
     </modules>

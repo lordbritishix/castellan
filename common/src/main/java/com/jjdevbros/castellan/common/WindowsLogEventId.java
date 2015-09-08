@@ -16,10 +16,10 @@ public enum WindowsLogEventId {
     SCREEN_UNLOCK(Pair.of("ScreenUnlock", 4801)),
 
     //Inactivity due to keyboard / mouse not moved
-    SCREENSAVER_ACTIVE(Pair.of("Inactive", 4802)),
+    SCREENSAVER_ACTIVE(Pair.of("ScreenSaverActive", 4802)),
 
     //Transition from inactivity to activity
-    SCREENSAVER_INACTIVE(Pair.of("Active", 4803)),
+    SCREENSAVER_INACTIVE(Pair.of("ScreenSaverInactive", 4803)),
 
     //User gets disconnected from the network
     NETWORK_DISCONNECTED(Pair.of("NetworkDisconnected", 10001)),
