@@ -8,12 +8,13 @@ import com.jjdevbros.castellan.common.NormalizedEventId;
 import com.jjdevbros.castellan.common.NormalizedEventModel;
 import com.jjdevbros.castellan.common.NormalizedSession;
 import com.jjdevbros.castellan.common.SessionPeriod;
-import com.jjdevbros.castellan.reportgenerator.validator.Validator;
+import com.jjdevbros.castellan.common.WindowsLogEventId;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -22,7 +23,6 @@ public class Sessionizer {
      * Produces a daily-grouped sessionized list of events:
      *
      * Session Period, Map< User Name, List<Events> >
-     *
      */
     public List<Pair<SessionPeriod, List<NormalizedSession>>>
                     sessionizeAndNormalize(List<EventModel> events, SessionPeriod sessionPeriod) {
@@ -47,8 +47,11 @@ public class Sessionizer {
     public List<NormalizedSession>
         getSessionizedEventsForPeriodWithoutSpillOver(List<EventModel> events, SessionPeriod sessionPeriod) {
 
+        List<EventModel> cleanedUpEvents = cleanupEventsBetween(events,
+                WindowsLogEventId.SCREEN_LOCK, WindowsLogEventId.SCREEN_UNLOCK);
+
         Map<String, List<EventModel>> processedEvents =
-            events.stream()
+                cleanedUpEvents.stream()
                 .filter(e -> sessionPeriod.isInSession(e.getTimestamp()))
                 .filter(e -> Constants.SUPPORTED_STATES.contains(e.getEventId()))
                 .sorted()
@@ -56,24 +59,57 @@ public class Sessionizer {
 
         List<NormalizedSession> normalizedSessions = Lists.newArrayList();
 
-        Validator validator = new Validator();
         for (String key : processedEvents.keySet()) {
             List<EventModel> event = processedEvents.get(key);
 
-            boolean isValid = validator.isValid(event);
-
-            if (!isValid) {
-                log.warn("Invalid event detected for: {}", event.toString());
-            }
-
             normalizedSessions.add(NormalizedSession.builder()
-                    .hasErrors(!isValid)
+                    .hasErrors(false)
                     .events(event.stream().map(e -> normalizeEvent(e)).collect(Collectors.toList()))
+                    .errorDescription("")
                     .userName(key).build());
 
         }
 
         return normalizedSessions;
+    }
+
+    /**
+     * Returns a list of screen lock / unlock sessions:
+     *
+     * e.g.
+     * SL, SU = SL, SU
+     * SL, LI, SU = SL, SU
+     */
+    @VisibleForTesting
+    List<EventModel> cleanupEventsBetween(List<EventModel> events,
+                                          WindowsLogEventId startEvent, WindowsLogEventId endEvent) {
+        List<EventModel> cleanedUpList = Lists.newArrayList(events.stream().sorted().collect(Collectors.toList()));
+        List<EventModel> toBeRemoved = Lists.newArrayList();
+        Stack<EventModel> stack = new Stack<>();
+
+        boolean slFound = false;
+        for (EventModel event : events) {
+            if (event.getEventId() ==  startEvent) {
+                slFound = true;
+                stack.clear();
+            }
+            else if (event.getEventId() ==  endEvent) {
+                if (slFound) {
+                    toBeRemoved.addAll(stack.stream().collect(Collectors.toList()));
+                    stack.clear();
+                }
+                slFound = false;
+            }
+            else {
+                if (slFound) {
+                    stack.push(event);
+                }
+            }
+        }
+
+        stack.clear();
+        cleanedUpList.removeAll(toBeRemoved);
+        return cleanedUpList;
     }
 
     /**
@@ -98,14 +134,14 @@ public class Sessionizer {
 
         switch(eventModel.getEventId()) {
             case SCREEN_LOCK:
-            case USER_INACTIVE:
+            case SCREENSAVER_ACTIVE:
             case LOG_OUT:
                 builder.eventId(NormalizedEventId.INACTIVE);
                 break;
 
             case LOG_IN:
             case SCREEN_UNLOCK:
-            case USER_ACTIVE:
+            case SCREENSAVER_INACTIVE:
                 builder.eventId(NormalizedEventId.ACTIVE);
                 break;
 

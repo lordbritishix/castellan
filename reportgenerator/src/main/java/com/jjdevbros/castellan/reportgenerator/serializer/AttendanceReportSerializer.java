@@ -1,5 +1,6 @@
 package com.jjdevbros.castellan.reportgenerator.serializer;
 
+import com.jjdevbros.castellan.common.Constants;
 import com.jjdevbros.castellan.common.InactivePeriod;
 import com.jjdevbros.castellan.common.SessionPeriod;
 import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
@@ -23,7 +24,6 @@ import java.util.TimeZone;
  */
 public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport> {
     private static final SimpleDateFormat SF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z");
-    private static final String EN_DASH = "–";
 
     public AttendanceReportSerializer() {
         SF.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -46,7 +46,7 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
 
             jsonGenerator.writeStartObject();
             jsonGenerator.writeFieldName(
-                    SF.format(Date.from(attendanceReport.getPeriod().getStartTime().toInstant(ZoneOffset.UTC))));
+                    SF.format(Date.from(key.getStartTime().toInstant(ZoneOffset.UTC))));
             jsonGenerator.writeStartArray();
 
             List<UserReport> userReports = reports.get(key);
@@ -67,7 +67,6 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
 
     private void writeUserReport(UserReport userReport, JsonGenerator generator) throws IOException {
         generator.writeStartObject();
-
         generator.writeStringField("userName", userReport.getUserName());
         writeInstant("startTime", userReport.getStartTime(), generator);
         writeInstant("endTime", userReport.getEndTime(), generator);
@@ -75,22 +74,19 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
         writeDuration("activityDuration", userReport.getActivityDuration(), generator);
         writeDuration("workDuration", userReport.getWorkDuration(), generator);
         generator.writeBooleanField("hasErrors", userReport.isHasErrors());
-
+        generator.writeStringField("errorDescription", userReport.getErrorDescription());
         generator.writeArrayFieldStart("inactivePeriods");
-
         for (InactivePeriod inactivePeriod : userReport.getInactivePeriods()) {
             writeInactivePeriod(inactivePeriod, generator);
 
         }
-
         generator.writeEndArray();
-
         generator.writeEndObject();
     }
 
     private void writeInactivePeriod(InactivePeriod period, JsonGenerator generator) throws IOException {
         if (period == null) {
-            generator.writeString(EN_DASH);
+            generator.writeString(Constants.EN_DASH);
         }
         else {
             String formattedPeriod = String.format("%s - %s",
@@ -105,13 +101,13 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
             generator.writeStringField(key, SF.format(Date.from(value)));
         }
         else {
-            generator.writeStringField(key, EN_DASH);
+            generator.writeStringField(key, Constants.EN_DASH);
         }
     }
 
     private void writeDuration(String key, Duration value, JsonGenerator generator) throws IOException {
         if (value == null) {
-            generator.writeStringField(key, EN_DASH);
+            generator.writeStringField(key, Constants.EN_DASH);
         }
         else {
             long sec = value.getSeconds();

@@ -1,18 +1,26 @@
 package com.jjdevbros.castellan.reportgenerator.serializer;
 
 import com.google.common.collect.ImmutableList;
+import com.jjdevbros.castellan.common.Constants;
 import com.jjdevbros.castellan.common.EventModel;
 import com.jjdevbros.castellan.common.SessionPeriod;
 import com.jjdevbros.castellan.common.WindowsLogEventId;
 import com.jjdevbros.castellan.reportgenerator.generator.AttendanceReportGenerator;
 import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
 /**
  * Created by lordbritishix on 06/09/15.
@@ -51,24 +59,114 @@ public class JsonWriterTest {
 
         AttendanceReport attendanceReport = generator.generateAttendanceReport(events, period);
         String json = fixture.serialize(attendanceReport);
+
         System.out.println(json);
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.readTree(json);
+
+        assertThat(jsonNode.get("reportId").asText(), is(attendanceReport.getReportId().toString()));
+        assertThat(jsonNode.get("sessionStart").asText(), is("2015-09-02T00:00:00 UTC"));
+        assertThat(jsonNode.get("sessionEnd").asText(), is("2015-09-04T00:00:00 UTC"));
+
+        assertThat(jsonNode.get("userReports").size(), is(2));
+        assertThat(jsonNode.get("userReports").get(0).get("2015-09-02T00:00:00 UTC"), notNullValue());
+        assertThat(jsonNode.get("userReports").get(1).get("2015-09-03T00:00:00 UTC"), notNullValue());
     }
 
     @Test
-    public void generateJsonReturnsCorrectJsonForInvalidCase() throws IOException {
+    @Ignore
+    public void generateJsonReturnsCorrectJsonForInvalidCase1() throws IOException {
         List<EventModel> events = ImmutableList.of(
                 buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-02T08:15:30.00Z", "Jim"),
                 buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T09:15:30.00Z", "Jim"),
-                buildTestEvent(WindowsLogEventId.USER_ACTIVE, "2015-09-02T09:30:30.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREENSAVER_INACTIVE, "2015-09-02T09:30:30.00Z", "Jim"),
                 buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-02T18:15:30.00Z", "Jim")
         );
 
-        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 3));
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         AttendanceReport attendanceReport = generator.generateAttendanceReport(events, period);
         String json = fixture.serialize(attendanceReport);
         System.out.println(json);
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.readTree(json);
+
+        assertThat(jsonNode.get("reportId").asText(), is(attendanceReport.getReportId().toString()));
+        assertThat(jsonNode.get("sessionStart").asText(), is("2015-09-02T00:00:00 UTC"));
+        assertThat(jsonNode.get("sessionEnd").asText(), is("2015-09-03T00:00:00 UTC"));
+
+        JsonNode userReport = jsonNode.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        assertThat(userReport.get("userName").asText(), is("Jim"));
+        assertThat(userReport.get("startTime").asText(), is(Constants.EN_DASH));
+        assertThat(userReport.get("endTime").asText(), is(Constants.EN_DASH));
+        assertThat(userReport.get("inactivityDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("activityDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("workDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("hasErrors").asBoolean(), is(true));
+
     }
+
+    @Test
+    public void generateJsonReturnsCorrectJsonForEventWithoutStartTime() throws IOException {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-02T08:15:30.00Z", "Jim")
+        );
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
+
+        AttendanceReport attendanceReport = generator.generateAttendanceReport(events, period);
+        String json = fixture.serialize(attendanceReport);
+        System.out.println(json);
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.readTree(json);
+
+        assertThat(jsonNode.get("reportId").asText(), is(attendanceReport.getReportId().toString()));
+        assertThat(jsonNode.get("sessionStart").asText(), is("2015-09-02T00:00:00 UTC"));
+        assertThat(jsonNode.get("sessionEnd").asText(), is("2015-09-03T00:00:00 UTC"));
+
+        JsonNode userReport = jsonNode.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        assertThat(userReport.get("userName").asText(), is("Jim"));
+        assertThat(userReport.get("startTime").asText(), is(Constants.EN_DASH));
+        assertThat(userReport.get("endTime").asText(), is(Constants.EN_DASH));
+        assertThat(userReport.get("inactivityDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("activityDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("workDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("hasErrors").asBoolean(), is(true));
+    }
+
+    @Test
+    public void generateJsonReturnsCorrectJsonForEventWithoutEndTime() throws IOException {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-02T08:15:30.00Z", "Jim")
+        );
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
+
+        AttendanceReport attendanceReport = generator.generateAttendanceReport(events, period);
+        String json = fixture.serialize(attendanceReport);
+        System.out.println(json);
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.readTree(json);
+
+        assertThat(jsonNode.get("reportId").asText(), is(attendanceReport.getReportId().toString()));
+        assertThat(jsonNode.get("sessionStart").asText(), is("2015-09-02T00:00:00 UTC"));
+        assertThat(jsonNode.get("sessionEnd").asText(), is("2015-09-03T00:00:00 UTC"));
+
+        JsonNode userReport = jsonNode.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        assertThat(userReport.get("userName").asText(), is("Jim"));
+        assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:15:30 UTC"));
+        assertThat(userReport.get("endTime").asText(), is(Constants.EN_DASH));
+        assertThat(userReport.get("inactivityDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("activityDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("workDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("hasErrors").asBoolean(), is(true));
+
+    }
+
 
 
     private EventModel buildTestEvent(WindowsLogEventId eventId, String timestamp, String username) {

@@ -11,9 +11,10 @@ public final class Constants {
     public static final List<WindowsLogEventId> SUPPORTED_STATES = ImmutableList.of(
             WindowsLogEventId.LOG_IN,
             WindowsLogEventId.LOG_OUT,
-            WindowsLogEventId.USER_INACTIVE,
-            WindowsLogEventId.USER_ACTIVE,
+            WindowsLogEventId.SCREENSAVER_ACTIVE,
+            WindowsLogEventId.SCREENSAVER_INACTIVE,
             WindowsLogEventId.SCREEN_LOCK,
             WindowsLogEventId.SCREEN_UNLOCK);
 
+    public static final String EN_DASH = "–";
 }

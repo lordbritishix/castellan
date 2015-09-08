@@ -22,6 +22,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -44,8 +45,8 @@ public class UserReportGeneratorTest {
         events.add(buildTestEvent(Instant.parse("2015-09-02T12:15:30.00Z").toEpochMilli(), NormalizedEventId.ACTIVE));
         events.add(buildTestEvent(Instant.parse("2015-09-02T10:15:30.00Z").toEpochMilli(), NormalizedEventId.INACTIVE));
 
-        assertThat(fixture.computeStartTime(NormalizedSession.builder().events(events).build()),
-                is(Instant.parse("2015-09-02T08:15:30.00Z").toEpochMilli()));
+        assertThat(fixture.computeStartTime(NormalizedSession.builder().events(events).build()).get(),
+                    is(Instant.parse("2015-09-02T08:15:30.00Z")));
     }
 
     @Test
@@ -53,8 +54,8 @@ public class UserReportGeneratorTest {
         List<NormalizedEventModel> events = Lists.newArrayList();
         events.add(buildTestEvent(Instant.parse("2015-09-02T08:15:30.00Z").toEpochMilli(), NormalizedEventId.ACTIVE));
 
-        assertThat(fixture.computeStartTime(NormalizedSession.builder().events(events).build()),
-                is(Instant.parse("2015-09-02T08:15:30.00Z").toEpochMilli()));
+        assertThat(fixture.computeStartTime(NormalizedSession.builder().events(events).build()).get(),
+                    is(Instant.parse("2015-09-02T08:15:30.00Z")));
     }
 
     @Test
@@ -67,8 +68,8 @@ public class UserReportGeneratorTest {
         events.add(buildTestEvent(Instant.parse("2015-09-02T08:15:30.00Z").toEpochMilli(), NormalizedEventId.ACTIVE));
         events.add(buildTestEvent(Instant.parse("2015-09-02T10:15:30.00Z").toEpochMilli(), NormalizedEventId.ACTIVE));
 
-        assertThat(fixture.computeStartTime(NormalizedSession.builder().events(events).build()),
-                is(Instant.parse("2015-09-02T08:15:30.00Z").toEpochMilli()));
+        assertThat(fixture.computeStartTime(NormalizedSession.builder().events(events).build()).get(),
+                    is(Instant.parse("2015-09-02T08:15:30.00Z")));
     }
 
     @Test
@@ -76,7 +77,7 @@ public class UserReportGeneratorTest {
         List<NormalizedEventModel> events = Lists.newArrayList();
         events.add(buildTestEvent(Instant.parse("2015-09-02T08:15:30.00Z").toEpochMilli(), NormalizedEventId.INACTIVE));
 
-        assertThat(fixture.computeStartTime(NormalizedSession.builder().events(events).build()), is(-1L));
+        assertFalse(fixture.computeStartTime(NormalizedSession.builder().events(events).build()).isPresent());
     }
 
     @Test
@@ -87,8 +88,8 @@ public class UserReportGeneratorTest {
         events.add(buildTestEvent(Instant.parse("2015-09-02T12:15:30.00Z").toEpochMilli(), NormalizedEventId.ACTIVE));
         events.add(buildTestEvent(Instant.parse("2015-09-02T10:15:30.00Z").toEpochMilli(), NormalizedEventId.INACTIVE));
 
-        assertThat(fixture.computeEndTime(NormalizedSession.builder().events(events).build(), -1L),
-                is(Instant.parse("2015-09-02T14:15:30.00Z").toEpochMilli()));
+        assertThat(fixture.computeEndTime(NormalizedSession.builder().events(events).build()).get(),
+                is(Instant.parse("2015-09-02T14:15:30.00Z")));
     }
 
     @Test
@@ -97,8 +98,8 @@ public class UserReportGeneratorTest {
         events.add(buildTestEvent(Instant.parse("2015-09-02T08:15:30.00Z").toEpochMilli(), NormalizedEventId.ACTIVE));
         events.add(buildTestEvent(Instant.parse("2015-09-02T10:15:30.00Z").toEpochMilli(), NormalizedEventId.INACTIVE));
 
-        assertThat(fixture.computeEndTime(NormalizedSession.builder().events(events).build(), -1L),
-                is(Instant.parse("2015-09-02T10:15:30.00Z").toEpochMilli()));
+        assertThat(fixture.computeEndTime(NormalizedSession.builder().events(events).build()).get(),
+                is(Instant.parse("2015-09-02T10:15:30.00Z")));
     }
 
 
@@ -112,17 +113,16 @@ public class UserReportGeneratorTest {
         events.add(buildTestEvent(Instant.parse("2015-09-02T14:15:30.00Z").toEpochMilli(), NormalizedEventId.INACTIVE));
         events.add(buildTestEvent(Instant.parse("2015-09-02T14:15:30.00Z").toEpochMilli(), NormalizedEventId.INACTIVE));
 
-        assertThat(fixture.computeEndTime(NormalizedSession.builder().events(events).build(), -1L),
-                is(Instant.parse("2015-09-02T14:15:30.00Z").toEpochMilli()));
+        assertThat(fixture.computeEndTime(NormalizedSession.builder().events(events).build()).get(),
+                is(Instant.parse("2015-09-02T14:15:30.00Z")));
     }
 
     @Test
-    public void testComputeEndTimeReturnsDefaultTimeForValidListWithoutInactive() {
+    public void testComputeEndTimeReturnsErrorForValidListWithoutInactive() {
         List<NormalizedEventModel> events = Lists.newArrayList();
         events.add(buildTestEvent(Instant.parse("2015-09-02T08:15:30.00Z").toEpochMilli(), NormalizedEventId.ACTIVE));
 
-        long now = Instant.now().toEpochMilli();
-        assertThat(fixture.computeEndTime(NormalizedSession.builder().events(events).build(), now), is(now));
+        assertFalse(fixture.computeEndTime(NormalizedSession.builder().events(events).build()).isPresent());
     }
 
     @Test
@@ -131,8 +131,7 @@ public class UserReportGeneratorTest {
         events.add(buildTestEvent(Instant.parse("2015-09-02T08:15:30.00Z").toEpochMilli(), NormalizedEventId.INACTIVE));
         events.add(buildTestEvent(Instant.parse("2015-09-02T08:17:30.00Z").toEpochMilli(), NormalizedEventId.INACTIVE));
 
-        long now = Instant.now().toEpochMilli();
-        assertThat(fixture.computeEndTime(NormalizedSession.builder().events(events).build(), now), is(-1L));
+        assertFalse(fixture.computeEndTime(NormalizedSession.builder().events(events).build()).isPresent());
     }
 
     @Test
@@ -342,9 +341,9 @@ public class UserReportGeneratorTest {
         UserReport report = fixture.generateUserReport("Jim",
                 NormalizedSession.builder().events(events).build(), period);
 
-        assertThat(report.getWorkDuration(), is(Duration.of(24L, ChronoUnit.HOURS)));
+        assertThat(report.getWorkDuration(), is(Duration.of(0L, ChronoUnit.HOURS)));
         assertThat(report.getInactivityDuration(), is(Duration.of(0L, ChronoUnit.HOURS)));
-        assertThat(report.getActivityDuration(), is(Duration.of(24L, ChronoUnit.HOURS)));
+        assertThat(report.getActivityDuration(), is(Duration.of(0L, ChronoUnit.HOURS)));
     }
 
     @Test
@@ -370,9 +369,9 @@ public class UserReportGeneratorTest {
         assertThat(report.isHasErrors(), is(true));
         assertThat(report.getStartTime(), nullValue());
         assertThat(report.getEndTime(), nullValue());
-        assertThat(report.getWorkDuration(), nullValue());
-        assertThat(report.getInactivityDuration(), nullValue());
-        assertThat(report.getActivityDuration(), nullValue());
+        assertThat(report.getWorkDuration(), is(Duration.ofHours(0L)));
+        assertThat(report.getInactivityDuration(), is(Duration.ofHours(0L)));
+        assertThat(report.getActivityDuration(), is(Duration.ofHours(0L)));
     }
 
 

@@ -18,4 +18,6 @@ public class NormalizedSession {
     private String userName;
 
     private boolean hasErrors;
+
+    private String errorDescription;
 }

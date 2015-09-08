@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
@@ -28,25 +29,40 @@ public class UserReportGenerator {
         UserReport.UserReportBuilder builder = UserReport.builder()
                 .userName(userName)
                 .period(period);
+        Optional<Instant> startTime = computeStartTime(events);
+        Optional<Instant> endTime = computeEndTime(events);
 
-        if (events.isHasErrors()) {
-            return builder.hasErrors(true).build();
-        }
-
-        Instant startTime = Instant.ofEpochMilli(computeStartTime(events));
-        Instant endTime = Instant.ofEpochMilli(
-                computeEndTime(events, period.getEndTime().toInstant(ZoneOffset.UTC).toEpochMilli()));
         List<InactivePeriod> inactivePeriods = getInactivityActivityPeriods(events);
-        Duration workDuration = Duration.between(startTime, endTime);
+        Optional<Duration> workDuration = Optional.empty();
+
         Duration inactivityDuration = computeInactivityDuration(inactivePeriods);
 
+        if (startTime.isPresent() && endTime.isPresent()) {
+            workDuration = Optional.of(Duration.between(startTime.get(), endTime.get()));
+        }
+        else {
+            if (!startTime.isPresent()) {
+                builder.errorDescription("No 'active' event in the session");
+            }
+            else {
+                builder.errorDescription("No 'terminal' event in the session");
+            }
+            builder.hasErrors(true);
+        }
+
+        Optional<Duration> activityDuration = Optional.empty();
+
+        if (workDuration.isPresent()) {
+            activityDuration = Optional.of(workDuration.get().minus(inactivityDuration));
+        }
+
         return builder
-                .startTime(startTime)
-                .endTime(endTime)
+                .startTime(startTime.orElse(null))
+                .endTime(endTime.orElse(null))
                 .inactivePeriods(inactivePeriods)
                 .inactivityDuration(inactivityDuration)
-                .workDuration(workDuration)
-                .activityDuration(workDuration.minus(inactivityDuration))
+                .workDuration(workDuration.orElse(Duration.ofHours(0L)))
+                .activityDuration(activityDuration.orElse(Duration.ofHours(0L)))
                 .build();
     }
 
@@ -55,29 +71,21 @@ public class UserReportGenerator {
      * Returns -1 if there is no Active event in the list of events
      */
     @VisibleForTesting
-    long computeStartTime(NormalizedSession session) {
-        if (session.isHasErrors()) {
-            return -1;
-        }
-
-        return session.getEvents().stream()
+    Optional<Instant> computeStartTime(NormalizedSession session) {
+        return Optional.ofNullable(session.getEvents().stream()
                 .sorted()
                 .filter(e -> e.getEventId().equals(NormalizedEventId.ACTIVE))
                 .findFirst()
-                .map(e -> e.getEventModel().getTimestamp())
-                .orElse(-1L)
-                .longValue();
+                .map(e -> Instant.ofEpochMilli(e.getEventModel().getTimestamp()))
+                .orElse(null));
+
     }
 
     /**
      * Time of the first "Inactive" event after the last "Active" event in the list of events
      */
     @VisibleForTesting
-    long computeEndTime(NormalizedSession events, long defaultEndTimeIfValid) {
-        if (events.isHasErrors()) {
-            return -1;
-        }
-
+    Optional<Instant> computeEndTime(NormalizedSession events) {
         List<NormalizedEventModel> baseEvents = events.getEvents().stream().sorted().collect(Collectors.toList());
 
         List<NormalizedEventModel> activeEvents = baseEvents.stream()
@@ -85,17 +93,18 @@ public class UserReportGenerator {
                 .collect(Collectors.toList());
 
         if (activeEvents.size() <= 0) {
-            return -1L;
+            return Optional.empty();
         }
 
         NormalizedEventModel lastEvent = activeEvents.get(activeEvents.size() - 1);
 
         List<NormalizedEventModel> sublist = baseEvents.subList(baseEvents.indexOf(lastEvent), baseEvents.size());
 
-        return sublist.stream()
+        return Optional.ofNullable(sublist.stream()
                 .filter(e -> e.getEventId().equals(NormalizedEventId.INACTIVE))
-                        .findFirst().map(e -> e.getEventModel().getTimestamp())
-                        .orElse(defaultEndTimeIfValid);
+                .findFirst()
+                .map(e -> Instant.ofEpochMilli(e.getEventModel().getTimestamp()))
+                .orElse(null));
     }
 
     /**

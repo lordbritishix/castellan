@@ -30,6 +30,13 @@ public class SessionizerTest {
         fixture = new Sessionizer();
     }
 
+    private EventModel createEvent(WindowsLogEventId eventId, String timestamp, String username) {
+        return EventModel.builder().eventId(eventId)
+                .timestamp(Instant.parse(timestamp).toEpochMilli())
+                .userName(username)
+                .build();
+    }
+
     @Test
     public void testSessionizeReturnsSessionizedEventListForUnrecognizedEvents() {
         EventModel event0 = EventModel.builder().eventId(WindowsLogEventId.LOG_OUT)
@@ -59,26 +66,6 @@ public class SessionizerTest {
 
         assertEquals(session.get(0).getEvents().stream().map(e -> e.getEventModel()).collect(Collectors.toList()),
                 ImmutableList.of(event0, event3));
-    }
-
-    @Test
-    public void testSessionizeReturnsEmptyListForInvalidEvents() {
-        EventModel event0 = EventModel.builder().eventId(WindowsLogEventId.LOG_OUT)
-                .timestamp(Instant.parse("2015-09-02T14:15:30.00Z").toEpochMilli())
-                .userName("Jim")
-                .build();
-
-        EventModel event1 = EventModel.builder().eventId(WindowsLogEventId.LOG_OUT)
-                .timestamp(Instant.parse("2015-09-03T08:00:00.00Z").toEpochMilli())
-                .userName("Jim")
-                .build();
-
-        List<EventModel> events = ImmutableList.of(event0, event1);
-        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 1), LocalDate.of(2015, 9, 6));
-        List<NormalizedSession> session =
-                fixture.getSessionizedEventsForPeriodWithoutSpillOver(events, period);
-
-        assertThat(session.get(0).isHasErrors(), is(true));
     }
 
     @Test
@@ -136,12 +123,12 @@ public class SessionizerTest {
                 .userName("Jim")
                 .build();
 
-        EventModel event4 = EventModel.builder().eventId(WindowsLogEventId.USER_INACTIVE)
+        EventModel event4 = EventModel.builder().eventId(WindowsLogEventId.SCREENSAVER_ACTIVE)
                 .timestamp(Instant.parse("2015-09-03T12:00:00.00Z").toEpochMilli())
                 .userName("Jim")
                 .build();
 
-        EventModel event5 = EventModel.builder().eventId(WindowsLogEventId.USER_ACTIVE)
+        EventModel event5 = EventModel.builder().eventId(WindowsLogEventId.SCREENSAVER_INACTIVE)
                 .timestamp(Instant.parse("2015-09-03T13:00:00.00Z").toEpochMilli())
                 .userName("Jim")
                 .build();
@@ -345,18 +332,128 @@ public class SessionizerTest {
 
         assertThat(event.getEventId(), is(NormalizedEventId.ACTIVE));
 
-        event = fixture.normalizeEvent(EventModel.builder().eventId(WindowsLogEventId.USER_ACTIVE)
+        event = fixture.normalizeEvent(EventModel.builder().eventId(WindowsLogEventId.SCREENSAVER_INACTIVE)
                 .timestamp(Instant.parse("2015-09-02T14:15:30.00Z").toEpochMilli())
                 .userName("Jim")
                 .build());
 
         assertThat(event.getEventId(), is(NormalizedEventId.ACTIVE));
 
-        event = fixture.normalizeEvent(EventModel.builder().eventId(WindowsLogEventId.USER_INACTIVE)
+        event = fixture.normalizeEvent(EventModel.builder().eventId(WindowsLogEventId.SCREENSAVER_ACTIVE)
                 .timestamp(Instant.parse("2015-09-02T14:15:30.00Z").toEpochMilli())
                 .userName("Jim")
                 .build());
 
         assertThat(event.getEventId(), is(NormalizedEventId.INACTIVE));
     }
+
+    @Test
+    public void testCleanupScreenLockUnlockSession1() {
+        List<EventModel> events = ImmutableList.of(
+                createEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T14:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.LOG_IN, "2015-09-02T14:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T14:15:30.00Z", "Jim")
+        );
+
+        List<EventModel> cleanedUpEvents = fixture.cleanupEventsBetween(events,
+                WindowsLogEventId.SCREEN_LOCK, WindowsLogEventId.SCREEN_UNLOCK);
+        assertThat(cleanedUpEvents.size(), is(2));
+        assertThat(cleanedUpEvents.get(0), is(events.get(0)));
+        assertThat(cleanedUpEvents.get(1), is(events.get(2)));
+    }
+
+    @Test
+    public void testCleanupScreenLockUnlockSession2() {
+        List<EventModel> events = ImmutableList.of(
+                createEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T14:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.LOG_IN, "2015-09-02T14:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T14:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T15:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.LOG_IN, "2015-09-02T15:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T15:15:30.00Z", "Jim")
+        );
+
+        List<EventModel> cleanedUpEvents = fixture.cleanupEventsBetween(events,
+                WindowsLogEventId.SCREEN_LOCK, WindowsLogEventId.SCREEN_UNLOCK);
+        assertThat(cleanedUpEvents.size(), is(4));
+        assertThat(cleanedUpEvents.get(0), is(events.get(0)));
+        assertThat(cleanedUpEvents.get(1), is(events.get(2)));
+        assertThat(cleanedUpEvents.get(2), is(events.get(3)));
+        assertThat(cleanedUpEvents.get(3), is(events.get(5)));
+    }
+
+    @Test
+    public void testCleanupScreenLockUnlockSession3() {
+        List<EventModel> events = ImmutableList.of(
+                createEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T14:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.LOG_OUT, "2015-09-02T14:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.LOG_IN, "2015-09-02T14:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T15:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.LOG_IN, "2015-09-02T15:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T15:15:30.00Z", "Jim")
+        );
+
+        List<EventModel> cleanedUpEvents = fixture.cleanupEventsBetween(events,
+                WindowsLogEventId.SCREEN_LOCK, WindowsLogEventId.SCREEN_UNLOCK);
+        assertThat(cleanedUpEvents.size(), is(5));
+        assertThat(cleanedUpEvents.get(3), is(events.get(3)));
+        assertThat(cleanedUpEvents.get(4), is(events.get(5)));
+    }
+
+    @Test
+    public void testCleanupScreenLockUnlockSession4() {
+        List<EventModel> events = ImmutableList.of(
+                createEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T14:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREENSAVER_ACTIVE, "2015-09-02T14:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREENSAVER_INACTIVE, "2015-09-02T14:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREENSAVER_ACTIVE, "2015-09-02T14:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREENSAVER_INACTIVE, "2015-09-02T14:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREENSAVER_ACTIVE, "2015-09-02T14:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREENSAVER_INACTIVE, "2015-09-02T14:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T15:15:30.00Z", "Jim")
+        );
+
+        List<EventModel> cleanedUpEvents = fixture.cleanupEventsBetween(events,
+                WindowsLogEventId.SCREEN_LOCK, WindowsLogEventId.SCREEN_UNLOCK);
+        assertThat(cleanedUpEvents.size(), is(2));
+        assertThat(cleanedUpEvents.get(0), is(events.get(0)));
+        assertThat(cleanedUpEvents.get(1), is(events.get(7)));
+    }
+
+    @Test
+    public void testCleanupScreenLockUnlockSession5() {
+        List<EventModel> events = ImmutableList.of(
+                createEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T14:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.LOG_IN, "2015-09-02T14:15:30.00Z", "Jim"),
+                createEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T14:15:30.00Z", "Jim")
+        );
+
+        List<EventModel> cleanedUpEvents = fixture.cleanupEventsBetween(events,
+                WindowsLogEventId.SCREEN_LOCK, WindowsLogEventId.SCREEN_UNLOCK);
+        assertThat(cleanedUpEvents.size(), is(3));
+    }
+
+    @Test
+    public void testCleanupScreenLockUnlockSession6() {
+        List<EventModel> events = ImmutableList.of(
+                createEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T14:15:30.00Z", "Jim")
+        );
+
+        List<EventModel> cleanedUpEvents = fixture.cleanupEventsBetween(events,
+                WindowsLogEventId.SCREEN_LOCK, WindowsLogEventId.SCREEN_UNLOCK);
+        assertThat(cleanedUpEvents.size(), is(1));
+    }
+
+    @Test
+    public void testCleanupScreenLockUnlockSession7() {
+        List<EventModel> events = ImmutableList.of(
+                createEvent(WindowsLogEventId.LOG_IN, "2015-09-02T14:15:30.00Z", "Jim")
+        );
+
+        List<EventModel> cleanedUpEvents = fixture.cleanupEventsBetween(events,
+                WindowsLogEventId.SCREEN_LOCK, WindowsLogEventId.SCREEN_UNLOCK);
+        assertThat(cleanedUpEvents.size(), is(1));
+    }
+
+
 }

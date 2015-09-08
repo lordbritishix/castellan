@@ -54,6 +54,11 @@ public class UserReport implements Comparable {
     private boolean hasErrors;
 
     /**
+     * Description of the error
+     */
+    private String errorDescription;
+
+    /**
      * List of inactive periods for this user
      */
     @Singular
