@@ -30,7 +30,8 @@ public class UserReportGenerator {
     public UserReport generateUserReport(String userName, NormalizedSession events, SessionPeriod period) {
         UserReport.UserReportBuilder builder = UserReport.builder()
                 .userName(userName)
-                .period(period);
+                .period(period)
+                .sourceEvents(events.getEvents().stream().map(e -> e.getEventModel()).collect(Collectors.toList()));
         List<String> errorDescriptions = Lists.newArrayList();
         Optional<Instant> startTime = computeStartTime(events);
         Optional<Instant> endTime = computeEndTime(events);

@@ -1,10 +1,10 @@
 package com.jjdevbros.castellan.common;
 
+import java.util.Map;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.Map;
 
 /**
  * Created by lordbritishix on 04/09/15.
@@ -31,7 +31,7 @@ public class EventModel implements Comparable {
     /**
      * Some other information about the event
      */
-    private Map rawData;
+    private Map<String, Object> rawData;
 
     @Override
     public int compareTo(Object o) {

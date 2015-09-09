@@ -1,17 +1,20 @@
 package com.jjdevbros.castellan.reportgenerator.report;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+import com.jjdevbros.castellan.common.EventModel;
 import com.jjdevbros.castellan.common.InactivePeriod;
 import com.jjdevbros.castellan.common.SessionPeriod;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.List;
-
 /**
  * Created by lordbritishix on 05/09/15.
+ *
+ * Models the user report
  */
 @Data
 @Builder
@@ -63,6 +66,12 @@ public class UserReport implements Comparable {
      */
     @Singular
     private List<InactivePeriod> inactivePeriods;
+
+    /**
+     * Store raw events for debugging
+     */
+    @Singular
+    private List<EventModel> sourceEvents;
 
     @Override
     public int compareTo(Object o) {

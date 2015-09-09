@@ -1,14 +1,5 @@
 package com.jjdevbros.castellan.reportgenerator.serializer;
 
-import com.jjdevbros.castellan.common.Constants;
-import com.jjdevbros.castellan.common.InactivePeriod;
-import com.jjdevbros.castellan.common.SessionPeriod;
-import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
-import com.jjdevbros.castellan.reportgenerator.report.UserReport;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.map.JsonSerializer;
-import org.codehaus.jackson.map.SerializerProvider;
-
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -18,9 +9,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.map.JsonSerializer;
+import org.codehaus.jackson.map.SerializerProvider;
+import com.jjdevbros.castellan.common.Constants;
+import com.jjdevbros.castellan.common.EventModel;
+import com.jjdevbros.castellan.common.InactivePeriod;
+import com.jjdevbros.castellan.common.SessionPeriod;
+import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
+import com.jjdevbros.castellan.reportgenerator.report.UserReport;
 
 /**
  * Created by lordbritishix on 06/09/15.
+ *
+ * Serializes an AttendanceReport object to json
+ * It is formatted in a way that it gets written directly to the report without much transformation (ideally)
  */
 public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport> {
     private static final SimpleDateFormat SF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z");
@@ -43,7 +47,6 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
         Map<SessionPeriod, List<UserReport>> reports = attendanceReport.getUserReports();
 
         for (SessionPeriod key : reports.keySet()) {
-
             jsonGenerator.writeStartObject();
             jsonGenerator.writeFieldName(
                     SF.format(Date.from(key.getStartTime().toInstant(ZoneOffset.UTC))));
@@ -57,12 +60,10 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
 
             jsonGenerator.writeEndArray();
             jsonGenerator.writeEndObject();
-
         }
+
         jsonGenerator.writeEndArray();
-
         jsonGenerator.writeEndObject();
-
     }
 
     private void writeUserReport(UserReport userReport, JsonGenerator generator) throws IOException {
@@ -81,8 +82,18 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
 
         }
         generator.writeEndArray();
+
+        generator.writeStringField("src", sourceEventsFormatter(userReport.getSourceEvents()));
         generator.writeEndObject();
     }
+
+    private String sourceEventsFormatter(List<EventModel> events) {
+        return events.stream()
+                .map(p -> p.getEventId().toString() + " " + p.getUserName() + " "
+                        + SF.format(Date.from(Instant.ofEpochMilli(p.getTimestamp()))))
+                .collect(Collectors.joining("\t"));
+    }
+
 
     private void writeInactivePeriod(InactivePeriod period, JsonGenerator generator) throws IOException {
         if (period == null) {

@@ -14,6 +14,8 @@ import java.util.UUID;
 
 /**
  * Created by lordbritishix on 05/09/15.
+ *
+ * Models the attendance report for a given period
  */
 @Data
 @Builder

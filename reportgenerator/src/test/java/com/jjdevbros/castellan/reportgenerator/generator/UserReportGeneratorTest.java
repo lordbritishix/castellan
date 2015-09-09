@@ -1,5 +1,13 @@
 package com.jjdevbros.castellan.reportgenerator.generator;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import org.junit.*;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.jjdevbros.castellan.common.EventModel;
@@ -9,22 +17,10 @@ import com.jjdevbros.castellan.common.NormalizedEventModel;
 import com.jjdevbros.castellan.common.NormalizedSession;
 import com.jjdevbros.castellan.common.SessionPeriod;
 import com.jjdevbros.castellan.reportgenerator.report.UserReport;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by lordbritishix on 05/09/15.

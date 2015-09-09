@@ -15,12 +15,14 @@ import com.jjdevbros.castellan.common.WindowsLogEventId;
 import com.jjdevbros.castellan.reportgenerator.generator.AttendanceReportGenerator;
 import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
 
+import lombok.extern.slf4j.Slf4j;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 /**
  * Created by lordbritishix on 07/09/15.
  */
+@Slf4j
 public class UseCasesTest {
     private AttendanceReportGenerator generator = new AttendanceReportGenerator();
     private JsonWriter fixture;
@@ -423,7 +425,7 @@ public class UseCasesTest {
 
     @Test
     @Ignore("Not supported yet")
-    public void testOutOfOrderedEvent1() throws IOException {
+    public void testOutOfOrderEvent1() throws IOException {
         List<EventModel> events = ImmutableList.of(
                 buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-02T08:00:00.00Z", "Jim"),
                 buildTestEvent(WindowsLogEventId.SCREENSAVER_INACTIVE, "2015-09-02T09:00:00.00Z", "Jim"),
@@ -445,12 +447,33 @@ public class UseCasesTest {
         assertThat(userReport.get("inactivePeriods").size(), is(0));
     }
 
+    @Test
+    public void testWithInvalidJsonCharacters() throws IOException {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-02T08:00:00.00Z", "Ji{}/[]\"/m Ryan"),
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-02T18:00:00.00Z", "Ji{}/[]\"/m Ryan")
+        );
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
+
+        JsonNode report = generateAttendanceReport(events, period);
+        JsonNode userReport = report.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+
+        assertThat(userReport.get("userName").asText(), is("Ji{}/[]\"/m Ryan"));
+        assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:00:00 UTC"));
+        assertThat(userReport.get("endTime").asText(), is("2015-09-02T18:00:00 UTC"));
+        assertThat(userReport.get("inactivityDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("activityDuration").asText(), is("10:00:00"));
+        assertThat(userReport.get("workDuration").asText(), is("10:00:00"));
+        assertThat(userReport.get("inactivePeriods").size(), is(0));
+    }
+
 
     private JsonNode generateAttendanceReport(List<EventModel> events, SessionPeriod period) throws IOException {
         AttendanceReport attendanceReport = generator.generateAttendanceReport(events, period);
         String json = fixture.serialize(attendanceReport);
 
-        System.out.println(json);
+        log.info(json);
 
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readTree(json);
