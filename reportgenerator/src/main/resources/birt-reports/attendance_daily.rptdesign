@@ -5,36 +5,210 @@
     <property name="iconFile">/templates/blank_report.gif</property>
     <property name="bidiLayoutOrientation">ltr</property>
     <property name="imageDPI">96</property>
-    <parameters>
-        <scalar-parameter name="reportSource" id="5">
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="distinct">true</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">sanple_daily.json</value>
-            </simple-property-list>
-            <list-property name="selectionList"/>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
+    <data-sources>
+        <script-data-source name="dailyAttendanceSource" id="30"/>
+    </data-sources>
+    <data-sets>
+        <script-data-set name="dailyAttendanceDataSet" id="31">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">reportId</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">reportGeneratedAt</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">reportId</property>
+                </structure>
+                <structure>
+                    <property name="columnName">reportGeneratedAt</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">reportId</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">reportGeneratedAt</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
             </structure>
-        </scalar-parameter>
-    </parameters>
+            <property name="dataSource">dailyAttendanceSource</property>
+            <method name="open"><![CDATA[importPackage(Packages.java.nio.file); 
+importPackage(Packages.java.lang); 
+importPackage(Packages.org.codehaus.jackson.map);
+importPackage(Packages.org.codehaus.jackson);
+
+input = new String(Files.readAllBytes(Paths.get("/home/lordbritishix/tmp/sample_monthly.json")));
+mapper = new ObjectMapper();
+jsonData = mapper.readTree(input);
+
+ctr = 0;]]></method>
+            <method name="fetch"><![CDATA[importPackage(Packages.java.lang);
+
+if (ctr < 1) {
+	row.reportId = jsonData.get("reportId").asText();
+	row.reportGeneratedAt = jsonData.get("reportedGeneratedAt").asText();
+	
+	ctr++;
+	
+	return true;
+}
+
+return false;]]></method>
+            <method name="close"><![CDATA[input = null;
+mapper = null;
+jsonData = null;
+ctr = 0;]]></method>
+        </script-data-set>
+        <script-data-set name="UserReport" id="117">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">start</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">end</property>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">start</property>
+                </structure>
+                <structure>
+                    <property name="columnName">end</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">start</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">end</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">dailyAttendanceSource</property>
+            <method name="open"><![CDATA[ctr = 0;]]></method>
+            <method name="fetch"><![CDATA[if (ctr < 20) {
+    row.start = "start" + ctr;
+    row.end = "end" + ctr;
+
+    ctr++;
+    return true;
+}
+
+return false;]]></method>
+        </script-data-set>
+    </data-sets>
     <page-setup>
         <simple-master-page name="Simple MasterPage" id="2">
-            <page-footer>
-                <text id="3">
-                    <property name="contentType">html</property>
-                    <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
-                </text>
-            </page-footer>
+            <page-header>
+                <grid id="109">
+                    <column id="110"/>
+                    <column id="111"/>
+                    <row id="112">
+                        <cell id="113">
+                            <label id="115">
+                                <property name="fontSize">x-large</property>
+                                <property name="fontWeight">bold</property>
+                                <text-property name="text">Attendance Report</text-property>
+                            </label>
+                        </cell>
+                        <cell id="114">
+                            <text id="116">
+                                <property name="fontSize">x-large</property>
+                                <property name="textAlign">right</property>
+                                <property name="contentType">html</property>
+                                <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
+                            </text>
+                        </cell>
+                    </row>
+                </grid>
+            </page-header>
         </simple-master-page>
     </page-setup>
     <body>
-        <label id="4">
-            <property name="fontSize">x-large</property>
-            <text-property name="text">Attendance Report</text-property>
-        </label>
+        <table id="139">
+            <property name="dataSet">UserReport</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">start</property>
+                    <text-property name="displayName">start</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["start"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">end</property>
+                    <text-property name="displayName">end</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["end"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <column id="152"/>
+            <column id="153"/>
+            <column id="154"/>
+            <header>
+                <row id="140">
+                    <cell id="141"/>
+                    <cell id="142"/>
+                    <cell id="143"/>
+                </row>
+            </header>
+            <detail>
+                <row id="144">
+                    <cell id="145">
+                        <label id="158">
+                            <text-property name="text">Start</text-property>
+                        </label>
+                    </cell>
+                    <cell id="146">
+                        <data id="165">
+                            <property name="resultSetColumn">start</property>
+                        </data>
+                    </cell>
+                    <cell id="147"/>
+                </row>
+                <row id="159">
+                    <cell id="160">
+                        <label id="163">
+                            <text-property name="text">End</text-property>
+                        </label>
+                    </cell>
+                    <cell id="161">
+                        <data id="166">
+                            <property name="resultSetColumn">end</property>
+                        </data>
+                    </cell>
+                    <cell id="162"/>
+                </row>
+            </detail>
+            <footer>
+                <row id="148">
+                    <cell id="149"/>
+                    <cell id="150"/>
+                    <cell id="151"/>
+                </row>
+            </footer>
+        </table>
     </body>
 </report>
