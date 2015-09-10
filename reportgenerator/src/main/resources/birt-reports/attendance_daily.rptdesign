@@ -5,11 +5,24 @@
     <property name="iconFile">/templates/blank_report.gif</property>
     <property name="bidiLayoutOrientation">ltr</property>
     <property name="imageDPI">96</property>
+    <parameters>
+        <scalar-parameter name="dataSource" id="183">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
     <data-sources>
         <script-data-source name="dailyAttendanceSource" id="30"/>
     </data-sources>
     <data-sets>
-        <script-data-set name="dailyAttendanceDataSet" id="31">
+        <script-data-set name="AttendanceDataSet" id="31">
             <list-property name="resultSetHints">
                 <structure>
                     <property name="position">1</property>
@@ -50,16 +63,18 @@ importPackage(Packages.java.lang);
 importPackage(Packages.org.codehaus.jackson.map);
 importPackage(Packages.org.codehaus.jackson);
 
-input = new String(Files.readAllBytes(Paths.get("/home/lordbritishix/tmp/sample_monthly.json")));
+ctr = 0;
+
+System.out.println("Generating UserReport dataset from " + params["dataSource"].value);
+
+input = new String(Files.readAllBytes(Paths.get(params["dataSource"].value)));
 mapper = new ObjectMapper();
-jsonData = mapper.readTree(input);
-
-ctr = 0;]]></method>
-            <method name="fetch"><![CDATA[importPackage(Packages.java.lang);
-
-if (ctr < 1) {
+jsonData = mapper.readTree(input);]]></method>
+            <method name="fetch"><![CDATA[if (ctr < 1) {
 	row.reportId = jsonData.get("reportId").asText();
 	row.reportGeneratedAt = jsonData.get("reportedGeneratedAt").asText();
+	
+	System.out.println("@@@@@@@@a" + jsonData.get("userReports").asText());
 	
 	ctr++;
 	
@@ -84,6 +99,36 @@ ctr = 0;]]></method>
                     <property name="name">end</property>
                     <property name="dataType">string</property>
                 </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">userName</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">workDuration</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">activityDuration</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">inactivePeriods</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">inactiveDuration</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">inactivePeriodDurations</property>
+                    <property name="dataType">string</property>
+                </structure>
             </list-property>
             <list-property name="columnHints">
                 <structure>
@@ -91,6 +136,24 @@ ctr = 0;]]></method>
                 </structure>
                 <structure>
                     <property name="columnName">end</property>
+                </structure>
+                <structure>
+                    <property name="columnName">userName</property>
+                </structure>
+                <structure>
+                    <property name="columnName">workDuration</property>
+                </structure>
+                <structure>
+                    <property name="columnName">activityDuration</property>
+                </structure>
+                <structure>
+                    <property name="columnName">inactivePeriods</property>
+                </structure>
+                <structure>
+                    <property name="columnName">inactiveDuration</property>
+                </structure>
+                <structure>
+                    <property name="columnName">inactivePeriodDurations</property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -105,19 +168,109 @@ ctr = 0;]]></method>
                         <property name="name">end</property>
                         <property name="dataType">string</property>
                     </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">userName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">workDuration</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">activityDuration</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">inactivePeriods</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">inactiveDuration</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">inactivePeriodDurations</property>
+                        <property name="dataType">string</property>
+                    </structure>
                 </list-property>
             </structure>
             <property name="dataSource">dailyAttendanceSource</property>
-            <method name="open"><![CDATA[ctr = 0;]]></method>
-            <method name="fetch"><![CDATA[if (ctr < 20) {
-    row.start = "start" + ctr;
-    row.end = "end" + ctr;
+            <method name="open"><![CDATA[importPackage(Packages.java.nio.file); 
+importPackage(Packages.java.lang); 
+importPackage(Packages.org.codehaus.jackson.map);
+importPackage(Packages.org.codehaus.jackson);
+
+ctr = 0;
+System.out.println("Generating Attendance data setfrom " + params["dataSource"].value);
+
+input = new String(Files.readAllBytes(Paths.get(params["dataSource"].value)));
+mapper = new ObjectMapper();
+root = mapper.readTree(input);
+
+sessions = root.get("sessions");
+userReports = root.get("userReports").get(0);
+
+//Only concerned about daily report, so only get the first session
+session = sessions.get(0);
+userReportPerUser = userReports.get(session.asText());
+
+]]></method>
+            <method name="fetch"><![CDATA[if (ctr < userReportPerUser.size()) {
+    session = sessions.get(ctr);
+    userReport = userReportPerUser.get(ctr);
+    
+    row.userName = userReport.get("userName").asText();
+    row.start = userReport.get("startTime").asText();
+    row.end = userReport.get("endTime").asText();
+    row.activityDuration = userReport.get("activityDuration").asText();
+    row.workDuration = userReport.get("workDuration").asText();
+    
+    size = userReport.path("inactivePeriods").size();
+    
+    row.inactivePeriods = "";
+    
+    if (size <= 0) {
+        row.inactivePeriods = "None";
+    }
+    else {
+	    for (x = 0; x < size; ++x) {
+	        row.inactivePeriods += userReport.path("inactivePeriods").path(x).asText();  
+	        row.inactivePeriods += "\n";  
+	    }
+    }
+    
+    size = userReport.path("inactivePeriodDurations").size();        
+    row.inactivePeriodDurations = "";
+
+    System.out.println(userReport.path("inactivePeriodDurations").size());
+
+    if (size <= 0) {
+        row.inactivePeriodDurations = "";
+    }
+    else {
+        for (x = 0; x < size; ++x) {
+            row.inactivePeriodDurations += userReport.path("inactivePeriodDurations").path(x).asText();  
+            row.inactivePeriodDurations += "\n";  
+        }
+    }
+
+    row.inactiveDuration = userReport.get("inactivityDuration").asText();        
 
     ctr++;
     return true;
 }
 
 return false;]]></method>
+            <method name="close"><![CDATA[input = null;
+mapper = null;
+jsonData = null;
+ctr = 0;]]></method>
         </script-data-set>
     </data-sets>
     <page-setup>
@@ -135,12 +288,20 @@ return false;]]></method>
                             </label>
                         </cell>
                         <cell id="114">
-                            <text id="116">
+                            <data id="182">
                                 <property name="fontSize">x-large</property>
                                 <property name="textAlign">right</property>
-                                <property name="contentType">html</property>
-                                <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
-                            </text>
+                                <property name="dataSet">AttendanceDataSet</property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">reportGeneratedAt</property>
+                                        <text-property name="displayName">reportGeneratedAt</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["reportGeneratedAt"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">reportGeneratedAt</property>
+                            </data>
                         </cell>
                     </row>
                 </grid>
@@ -148,9 +309,15 @@ return false;]]></method>
         </simple-master-page>
     </page-setup>
     <body>
-        <table id="139">
+        <list id="219">
             <property name="dataSet">UserReport</property>
             <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">userName</property>
+                    <text-property name="displayName">userName</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["userName"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
                 <structure>
                     <property name="name">start</property>
                     <text-property name="displayName">start</text-property>
@@ -163,52 +330,254 @@ return false;]]></method>
                     <expression name="expression" type="javascript">dataSetRow["end"]</expression>
                     <property name="dataType">string</property>
                 </structure>
+                <structure>
+                    <property name="name">activityDuration</property>
+                    <text-property name="displayName">activityDuration</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["activityDuration"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">workDuration</property>
+                    <text-property name="displayName">workDuration</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["workDuration"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">inactivePeriods</property>
+                    <text-property name="displayName">inactivePeriods</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["inactivePeriods"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">inactiveDuration</property>
+                    <text-property name="displayName">inactiveDuration</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["inactiveDuration"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">inactivePeriodDurations</property>
+                    <text-property name="displayName">inactivePeriodDurations</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["inactivePeriodDurations"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
             </list-property>
-            <column id="152"/>
-            <column id="153"/>
-            <column id="154"/>
-            <header>
-                <row id="140">
-                    <cell id="141"/>
-                    <cell id="142"/>
-                    <cell id="143"/>
-                </row>
-            </header>
             <detail>
-                <row id="144">
-                    <cell id="145">
-                        <label id="158">
-                            <text-property name="text">Start</text-property>
-                        </label>
-                    </cell>
-                    <cell id="146">
-                        <data id="165">
-                            <property name="resultSetColumn">start</property>
-                        </data>
-                    </cell>
-                    <cell id="147"/>
-                </row>
-                <row id="159">
-                    <cell id="160">
-                        <label id="163">
-                            <text-property name="text">End</text-property>
-                        </label>
-                    </cell>
-                    <cell id="161">
-                        <data id="166">
-                            <property name="resultSetColumn">end</property>
-                        </data>
-                    </cell>
-                    <cell id="162"/>
-                </row>
+                <grid id="256">
+                    <property name="borderBottomStyle">none</property>
+                    <property name="borderLeftStyle">none</property>
+                    <property name="borderRightStyle">none</property>
+                    <property name="borderTopStyle">none</property>
+                    <property name="marginBottom">10pt</property>
+                    <property name="width">7.854166666666667in</property>
+                    <column id="257">
+                        <property name="width">1.5104166666666667in</property>
+                    </column>
+                    <column id="258">
+                        <property name="width">1.78125in</property>
+                    </column>
+                    <column id="297">
+                        <property name="width">3.5208333333333335in</property>
+                    </column>
+                    <column id="307">
+                        <property name="width">1.0416666666666667in</property>
+                    </column>
+                    <row id="259">
+                        <cell id="260">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">medium</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">medium</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">medium</property>
+                            <data id="274">
+                                <property name="borderBottomStyle">none</property>
+                                <property name="borderLeftStyle">none</property>
+                                <property name="borderRightStyle">none</property>
+                                <property name="borderTopStyle">none</property>
+                                <property name="resultSetColumn">userName</property>
+                            </data>
+                        </cell>
+                        <cell id="261"/>
+                        <cell id="290"/>
+                        <cell id="300"/>
+                    </row>
+                    <row id="309">
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">medium</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">medium</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <cell id="310">
+                            <property name="borderBottomStyle">none</property>
+                            <property name="borderLeftStyle">none</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">medium</property>
+                            <property name="borderTopStyle">none</property>
+                        </cell>
+                        <cell id="311">
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">medium</property>
+                        </cell>
+                        <cell id="312">
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">medium</property>
+                            <label id="314">
+                                <text-property name="text">Inactive</text-property>
+                            </label>
+                        </cell>
+                        <cell id="313">
+                            <label id="308">
+                                <text-property name="text">Total</text-property>
+                            </label>
+                        </cell>
+                    </row>
+                    <row id="262">
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">medium</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">medium</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">medium</property>
+                        <cell id="263">
+                            <property name="borderBottomStyle">none</property>
+                            <property name="borderLeftStyle">none</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">medium</property>
+                            <property name="borderTopStyle">none</property>
+                            <label id="272">
+                                <text-property name="text">Start Time</text-property>
+                            </label>
+                        </cell>
+                        <cell id="264">
+                            <data id="275">
+                                <property name="resultSetColumn">start</property>
+                            </data>
+                        </cell>
+                        <cell id="291">
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">medium</property>
+                        </cell>
+                        <cell id="301">
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">medium</property>
+                        </cell>
+                    </row>
+                    <row id="287">
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">medium</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">medium</property>
+                        <cell id="288">
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">medium</property>
+                        </cell>
+                        <cell id="289">
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">medium</property>
+                        </cell>
+                        <cell id="292">
+                            <data id="299">
+                                <property name="resultSetColumn">inactivePeriods</property>
+                            </data>
+                        </cell>
+                        <cell id="302">
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">medium</property>
+                            <data id="316">
+                                <property name="resultSetColumn">inactivePeriodDurations</property>
+                            </data>
+                        </cell>
+                    </row>
+                    <row id="265">
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">medium</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">medium</property>
+                        <cell id="266">
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">medium</property>
+                            <label id="273">
+                                <text-property name="text">End Time</text-property>
+                            </label>
+                        </cell>
+                        <cell id="267">
+                            <data id="276">
+                                <property name="resultSetColumn">end</property>
+                            </data>
+                        </cell>
+                        <cell id="293">
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">medium</property>
+                        </cell>
+                        <cell id="303">
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">medium</property>
+                        </cell>
+                    </row>
+                    <row id="281">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">medium</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">medium</property>
+                        <cell id="282">
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">medium</property>
+                            <label id="284">
+                                <text-property name="text">Total time</text-property>
+                            </label>
+                        </cell>
+                        <cell id="283">
+                            <data id="286">
+                                <property name="resultSetColumn">workDuration</property>
+                            </data>
+                        </cell>
+                        <cell id="294">
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">medium</property>
+                        </cell>
+                        <cell id="304">
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">medium</property>
+                            <data id="315">
+                                <property name="resultSetColumn">inactiveDuration</property>
+                            </data>
+                        </cell>
+                    </row>
+                    <row id="277">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">medium</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">medium</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">medium</property>
+                        <cell id="278">
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">medium</property>
+                            <label id="280">
+                                <text-property name="text">Total working time</text-property>
+                            </label>
+                        </cell>
+                        <cell id="279">
+                            <data id="285">
+                                <property name="resultSetColumn">activityDuration</property>
+                            </data>
+                        </cell>
+                        <cell id="295"/>
+                        <cell id="305"/>
+                    </row>
+                    <row id="268">
+                        <cell id="269"/>
+                        <cell id="270"/>
+                        <cell id="296"/>
+                        <cell id="306"/>
+                    </row>
+                </grid>
             </detail>
-            <footer>
-                <row id="148">
-                    <cell id="149"/>
-                    <cell id="150"/>
-                    <cell id="151"/>
-                </row>
-            </footer>
-        </table>
+        </list>
     </body>
 </report>

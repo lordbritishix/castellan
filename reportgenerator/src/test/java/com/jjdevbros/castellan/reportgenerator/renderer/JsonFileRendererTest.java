@@ -39,7 +39,7 @@ public class JsonFileRendererTest {
         AttendanceReport attendanceReport = generator.generateAttendanceReport(events, period);
 
         Path temp = Files.createTempFile("test_", null);
-        fixture.render(attendanceReport, temp);
+        fixture.write(attendanceReport, temp);
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(temp.toFile());

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 /**
@@ -15,4 +16,8 @@ import java.time.LocalDateTime;
 public class InactivePeriod {
     private LocalDateTime start;
     private LocalDateTime end;
+
+    public Duration getDuration() {
+        return Duration.between(start, end);
+    }
 }

@@ -10,9 +10,8 @@ import com.jjdevbros.castellan.reportgenerator.serializer.JsonWriter;
 /**
  * Created by lordbritishix on 06/09/15.
  */
-public class JsonFileRenderer implements FileRenderer {
-    @Override
-    public void render(AttendanceReport report, Path path) throws IOException {
+public class JsonFileRenderer {
+    public void write(AttendanceReport report, Path path) throws IOException {
         JsonWriter writer = new JsonWriter();
         String json = writer.serialize(report);
         Files.write(path, json.getBytes(StandardCharsets.UTF_8));

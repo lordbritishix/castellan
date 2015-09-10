@@ -43,6 +43,19 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
                 attendanceReport.getPeriod().getStartTime().toInstant(ZoneOffset.UTC), jsonGenerator);
         writeInstant("sessionEnd", attendanceReport.getPeriod().getEndTime().toInstant(ZoneOffset.UTC), jsonGenerator);
 
+        jsonGenerator.writeArrayFieldStart("sessions");
+
+        attendanceReport.getUserReports().keySet().forEach(s -> {
+                    try {
+                        jsonGenerator.writeString(SF.format(Date.from(s.getStartTime().toInstant(ZoneOffset.UTC))));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        );
+        jsonGenerator.writeEndArray();
+
+
         jsonGenerator.writeArrayFieldStart("userReports");
         Map<SessionPeriod, List<UserReport>> reports = attendanceReport.getUserReports();
 
@@ -79,7 +92,11 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
         generator.writeArrayFieldStart("inactivePeriods");
         for (InactivePeriod inactivePeriod : userReport.getInactivePeriods()) {
             writeInactivePeriod(inactivePeriod, generator);
-
+        }
+        generator.writeEndArray();
+        generator.writeArrayFieldStart("inactivePeriodDurations");
+        for (InactivePeriod inactivePeriod : userReport.getInactivePeriods()) {
+            writeDuration(inactivePeriod, generator);
         }
         generator.writeEndArray();
 
@@ -126,5 +143,17 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
             generator.writeStringField(key, duration);
         }
     }
+
+    private void writeDuration(InactivePeriod period, JsonGenerator generator) throws IOException {
+        if (period == null) {
+            generator.writeString(Constants.EN_DASH);
+        }
+        else {
+            long sec = period.getDuration().getSeconds();
+            String duration = String.format("%d:%02d:%02d", sec / 3600, (sec % 3600) / 60, (sec % 60));
+            generator.writeString(duration);
+        }
+    }
+
 
 }
