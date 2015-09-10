@@ -468,6 +468,26 @@ public class UseCasesTest {
         assertThat(userReport.get("inactivePeriods").size(), is(0));
     }
 
+    @Test
+    public void testOneMonthSession() throws IOException {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-02T08:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T18:00:00.00Z", "Jim")
+        );
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 1), LocalDate.of(2015, 9, 30));
+
+        JsonNode report = generateAttendanceReport(events, period);
+
+        JsonNode userReport = report.get("userReports").get(1).get("report").get(0);
+        assertThat(userReport.get("userName").asText(), is("Jim"));
+        assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:00:00 UTC"));
+        assertThat(userReport.get("endTime").asText(), is("2015-09-02T18:00:00 UTC"));
+        assertThat(userReport.get("inactivityDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("activityDuration").asText(), is("10:00:00"));
+        assertThat(userReport.get("workDuration").asText(), is("10:00:00"));
+        assertThat(userReport.get("hasErrors").asBoolean(), is(false));
+    }
 
     private JsonNode generateAttendanceReport(List<EventModel> events, SessionPeriod period) throws IOException {
         AttendanceReport attendanceReport = generator.generateAttendanceReport(events, period);

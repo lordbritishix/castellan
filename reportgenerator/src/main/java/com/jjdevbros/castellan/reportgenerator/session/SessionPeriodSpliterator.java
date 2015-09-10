@@ -14,11 +14,11 @@ public class SessionPeriodSpliterator {
     /**
      * Splits a SessionPeriod into a list of 1-day Session Periods
      */
-    public List<SessionPeriod> splitDaily(SessionPeriod period) {
+    public List<SessionPeriod> splitDaily(SessionPeriod sessionPeriod) {
         List<SessionPeriod> splits = Lists.newArrayList();
-        int periodInDays = period.getDuration().getDays();
+        long periodInDays = sessionPeriod.getDaysInBetween();
 
-        LocalDateTime next = period.getStartTime().toLocalDate().atStartOfDay();
+        LocalDateTime next = sessionPeriod.getStartTime().toLocalDate().atStartOfDay();
         for (int x = 0; x < periodInDays; ++x) {
             splits.add(new SessionPeriod(next.toLocalDate(), next.toLocalDate()));
             next = next.plus(1L, ChronoUnit.DAYS);

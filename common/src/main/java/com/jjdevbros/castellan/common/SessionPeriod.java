@@ -6,7 +6,6 @@ import lombok.Getter;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
@@ -35,8 +34,8 @@ public class SessionPeriod implements Comparable {
         return compare.isAfter(startTime.minus(1L, ChronoUnit.MILLIS)) && compare.isBefore(endTime);
     }
 
-    public Period getDuration() {
-        return Period.between(startTime.toLocalDate(), endTime.toLocalDate());
+    public long getDaysInBetween() {
+        return ChronoUnit.DAYS.between(startTime.toLocalDate(), endTime.toLocalDate());
     }
 
     @Override

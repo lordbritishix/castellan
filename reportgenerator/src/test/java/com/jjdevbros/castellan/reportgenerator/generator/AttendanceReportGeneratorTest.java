@@ -1,21 +1,24 @@
 package com.jjdevbros.castellan.reportgenerator.generator;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import org.junit.*;
 import com.google.common.collect.ImmutableList;
 import com.jjdevbros.castellan.common.EventModel;
 import com.jjdevbros.castellan.common.SessionPeriod;
 import com.jjdevbros.castellan.common.WindowsLogEventId;
 import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
 import com.jjdevbros.castellan.reportgenerator.report.UserReport;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 /**
  * Created by lordbritishix on 06/09/15.
@@ -27,6 +30,23 @@ public class AttendanceReportGeneratorTest {
     public void setup() {
         fixture = new AttendanceReportGenerator();
     }
+
+    @Test
+    public void generateAttendanceReportForOneMonth() {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-02T08:15:30.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-02T18:15:30.00Z", "Jim")
+        );
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 1), LocalDate.of(2015, 9, 30));
+
+        AttendanceReport attendanceReport = fixture.generateAttendanceReport(events, period);
+
+        assertThat(attendanceReport.getPeriod(), is(period));
+        assertThat(attendanceReport.getReportedGeneratedAt(), notNullValue());
+        assertThat(attendanceReport.getUserReports().size(), is(1));
+    }
+
 
     @Test
     public void generateAttendanceReportReturnsCorrectReportForMultipleLogin() {
@@ -106,8 +126,6 @@ public class AttendanceReportGeneratorTest {
                 getUserReportsForSingleDay(attendanceReport.getUserReports(), LocalDate.of(2015, 9, 2));
         assertThat(userReports.get(0).isHasErrors(), is(true));
     }
-
-
 
     @Test
     @Ignore
