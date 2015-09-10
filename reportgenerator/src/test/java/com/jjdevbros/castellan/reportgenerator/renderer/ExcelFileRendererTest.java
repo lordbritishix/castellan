@@ -1,20 +1,20 @@
 package com.jjdevbros.castellan.reportgenerator.renderer;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.List;
-import org.eclipse.birt.core.exception.BirtException;
-import org.junit.*;
 import com.google.common.collect.ImmutableList;
 import com.jjdevbros.castellan.common.EventModel;
 import com.jjdevbros.castellan.common.SessionPeriod;
 import com.jjdevbros.castellan.common.WindowsLogEventId;
 import com.jjdevbros.castellan.reportgenerator.generator.AttendanceReportGenerator;
 import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
+import org.eclipse.birt.core.exception.BirtException;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
 
 public class ExcelFileRendererTest {
     private ExcelFileRenderer renderer;
@@ -48,12 +48,19 @@ public class ExcelFileRendererTest {
                 buildTestEvent(WindowsLogEventId.SCREENSAVER_INACTIVE, "2015-09-02T17:30:00.00Z", "Jen"),
                 buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-02T18:00:00.00Z", "Jen"),
 
+                //Error
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-02T10:00:00.00Z", "Marcus"),
+
+                //Error
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-02T10:00:00.00Z", "Jared"),
+
+
                 buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-03T10:00:00.00Z", "Jeff"),
                 buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-03T18:00:00.00Z", "Jeff")
-                );
+        );
 
-        Path dir = Paths.get("/home/lordbritishix/tmp");
-        renderer.write(createAttendanceReport(events), Files.createTempFile(dir, "report", ".pdf"));
+//      Path dir = Paths.get("/home/lordbritishix/tmp");
+        renderer.write(createAttendanceReport(events), Files.createTempFile("report", ".pdf"));
     }
 
     private AttendanceReport createAttendanceReport(List<EventModel> events) throws IOException {

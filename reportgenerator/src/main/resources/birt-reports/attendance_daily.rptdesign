@@ -73,7 +73,7 @@ jsonData = mapper.readTree(input);]]></method>
             <method name="fetch"><![CDATA[if (ctr < 1) {
 	row.reportId = jsonData.get("reportId").asText();
 	row.reportGeneratedAt = jsonData.get("reportedGeneratedAt").asText();
-
+	
 	ctr++;
 	
 	return true;
@@ -127,6 +127,11 @@ ctr = 0;]]></method>
                     <property name="name">inactivePeriodDurations</property>
                     <property name="dataType">string</property>
                 </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">error</property>
+                    <property name="dataType">string</property>
+                </structure>
             </list-property>
             <list-property name="columnHints">
                 <structure>
@@ -152,6 +157,9 @@ ctr = 0;]]></method>
                 </structure>
                 <structure>
                     <property name="columnName">inactivePeriodDurations</property>
+                </structure>
+                <structure>
+                    <property name="columnName">error</property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -194,6 +202,11 @@ ctr = 0;]]></method>
                     <structure>
                         <property name="position">8</property>
                         <property name="name">inactivePeriodDurations</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">error</property>
                         <property name="dataType">string</property>
                     </structure>
                 </list-property>
@@ -240,6 +253,10 @@ report = userReport.get("report");]]></method>
             row.inactivePeriodDurations += reportData.path("inactivePeriods").path(x).get("duration").asText();  
             row.inactivePeriodDurations += "\n";  	        
 	    }
+    }
+    
+    if (reportData.get("hasErrors").asBoolean()) {
+        row.error = "Note: " + reportData.get("errorDescription").asText();
     }
     
     ctr++;
@@ -338,6 +355,12 @@ ctr = 0;]]></method>
                     <property name="name">inactivePeriodDurations</property>
                     <text-property name="displayName">inactivePeriodDurations</text-property>
                     <expression name="expression" type="javascript">dataSetRow["inactivePeriodDurations"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">error</property>
+                    <text-property name="displayName">error</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["error"]</expression>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
@@ -550,14 +573,14 @@ ctr = 0;]]></method>
                         <cell id="295"/>
                         <cell id="305"/>
                     </row>
-                    <row id="268">
-                        <cell id="269"/>
-                        <cell id="270"/>
-                        <cell id="296"/>
-                        <cell id="306"/>
-                    </row>
                 </grid>
             </detail>
+            <footer>
+                <data id="317">
+                    <property name="fontStyle">italic</property>
+                    <property name="resultSetColumn">error</property>
+                </data>
+            </footer>
         </list>
     </body>
 </report>
