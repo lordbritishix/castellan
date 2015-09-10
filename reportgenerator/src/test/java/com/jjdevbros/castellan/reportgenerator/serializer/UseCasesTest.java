@@ -47,7 +47,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
 
         assertThat(userReport.get("userName").asText(), is("Jim"));
         assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:00:00 UTC"));
@@ -56,8 +56,8 @@ public class UseCasesTest {
         assertThat(userReport.get("activityDuration").asText(), is("8:50:00"));
         assertThat(userReport.get("workDuration").asText(), is("10:00:00"));
         assertThat(userReport.get("inactivePeriods").size(), is(2));
-        assertThat(userReport.get("inactivePeriods").get(0).asText(), is("2015-09-02T09:00:00 UTC - 2015-09-02T10:00:00 UTC"));
-        assertThat(userReport.get("inactivePeriods").get(1).asText(), is("2015-09-02T10:00:00 UTC - 2015-09-02T10:10:00 UTC"));
+        assertThat(userReport.get("inactivePeriods").get(0).get("period").asText(), is("2015-09-02T09:00:00 UTC - 2015-09-02T10:00:00 UTC"));
+        assertThat(userReport.get("inactivePeriods").get(1).get("period").asText(), is("2015-09-02T10:00:00 UTC - 2015-09-02T10:10:00 UTC"));
     }
 
     @Test
@@ -72,7 +72,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
 
         assertThat(userReport.get("userName").asText(), is("Jim"));
         assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:00:00 UTC"));
@@ -81,7 +81,7 @@ public class UseCasesTest {
         assertThat(userReport.get("activityDuration").asText(), is("9:00:00"));
         assertThat(userReport.get("workDuration").asText(), is("10:00:00"));
         assertThat(userReport.get("inactivePeriods").size(), is(1));
-        assertThat(userReport.get("inactivePeriods").get(0).asText(), is("2015-09-02T09:00:00 UTC - 2015-09-02T10:00:00 UTC"));
+        assertThat(userReport.get("inactivePeriods").get(0).get("period").asText(), is("2015-09-02T09:00:00 UTC - 2015-09-02T10:00:00 UTC"));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
 
         assertThat(userReport.get("userName").asText(), is("Jim"));
         assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:00:00 UTC"));
@@ -116,7 +116,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
 
         assertThat(userReport.get("userName").asText(), is("Jim"));
         assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:00:00 UTC"));
@@ -138,7 +138,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
 
         assertThat(userReport.get("userName").asText(), is("Jim"));
         assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:00:00 UTC"));
@@ -162,7 +162,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
 
         assertThat(userReport.get("userName").asText(), is("Jim"));
         assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:00:00 UTC"));
@@ -171,7 +171,7 @@ public class UseCasesTest {
         assertThat(userReport.get("activityDuration").asText(), is("9:50:00"));
         assertThat(userReport.get("workDuration").asText(), is("10:00:00"));
         assertThat(userReport.get("inactivePeriods").size(), is(1));
-        assertThat(userReport.get("inactivePeriods").get(0).asText(), is("2015-09-02T10:00:00 UTC - 2015-09-02T10:10:00 UTC"));
+        assertThat(userReport.get("inactivePeriods").get(0).get("period").asText(), is("2015-09-02T10:00:00 UTC - 2015-09-02T10:10:00 UTC"));
     }
 
     @Test
@@ -186,7 +186,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
 
         assertThat(userReport.get("userName").asText(), is("Jim"));
         assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:00:00 UTC"));
@@ -195,7 +195,7 @@ public class UseCasesTest {
         assertThat(userReport.get("activityDuration").asText(), is("8:00:00"));
         assertThat(userReport.get("workDuration").asText(), is("10:00:00"));
         assertThat(userReport.get("inactivePeriods").size(), is(1));
-        assertThat(userReport.get("inactivePeriods").get(0).asText(), is("2015-09-02T10:00:00 UTC - 2015-09-02T12:00:00 UTC"));
+        assertThat(userReport.get("inactivePeriods").get(0).get("period").asText(), is("2015-09-02T10:00:00 UTC - 2015-09-02T12:00:00 UTC"));
     }
 
     @Test
@@ -210,7 +210,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
 
         assertThat(userReport.get("userName").asText(), is("Jim"));
         assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:00:00 UTC"));
@@ -234,7 +234,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
 
         assertThat(userReport.get("userName").asText(), is("Jim"));
         assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:00:00 UTC"));
@@ -243,7 +243,7 @@ public class UseCasesTest {
         assertThat(userReport.get("activityDuration").asText(), is("9:50:00"));
         assertThat(userReport.get("workDuration").asText(), is("10:00:00"));
         assertThat(userReport.get("inactivePeriods").size(), is(1));
-        assertThat(userReport.get("inactivePeriods").get(0).asText(), is("2015-09-02T10:00:00 UTC - 2015-09-02T10:10:00 UTC"));
+        assertThat(userReport.get("inactivePeriods").get(0).get("period").asText(), is("2015-09-02T10:00:00 UTC - 2015-09-02T10:10:00 UTC"));
     }
 
     @Test
@@ -280,7 +280,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
         assertThat(userReport.get("userName").asText(), is("Jim"));
         assertThat(userReport.get("startTime").asText(), is(Constants.EN_DASH));
         assertThat(userReport.get("endTime").asText(), is(Constants.EN_DASH));
@@ -301,7 +301,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
         assertThat(userReport.get("userName").asText(), is("Jim"));
         assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:00:00 UTC"));
         assertThat(userReport.get("endTime").asText(), is(Constants.EN_DASH));
@@ -325,7 +325,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
         assertThat(userReport.get("userName").asText(), is("Jim"));
         assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:00:00 UTC"));
         assertThat(userReport.get("endTime").asText(), is("2015-09-02T18:00:00 UTC"));
@@ -334,7 +334,7 @@ public class UseCasesTest {
         assertThat(userReport.get("workDuration").asText(), is("10:00:00"));
         assertThat(userReport.get("hasErrors").asBoolean(), is(false));
         assertThat(userReport.get("inactivePeriods").size(), is(1));
-        assertThat(userReport.get("inactivePeriods").get(0).asText(), is("2015-09-02T09:00:00 UTC - 2015-09-02T10:00:00 UTC"));
+        assertThat(userReport.get("inactivePeriods").get(0).get("period").asText(), is("2015-09-02T09:00:00 UTC - 2015-09-02T10:00:00 UTC"));
     }
 
     @Test
@@ -351,7 +351,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
         assertThat(userReport.get("userName").asText(), is("Jim"));
         assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:00:00 UTC"));
         assertThat(userReport.get("endTime").asText(), is("2015-09-02T18:00:00 UTC"));
@@ -360,7 +360,7 @@ public class UseCasesTest {
         assertThat(userReport.get("workDuration").asText(), is("10:00:00"));
         assertThat(userReport.get("hasErrors").asBoolean(), is(false));
         assertThat(userReport.get("inactivePeriods").size(), is(1));
-        assertThat(userReport.get("inactivePeriods").get(0).asText(), is("2015-09-02T12:00:00 UTC - 2015-09-02T13:00:00 UTC"));
+        assertThat(userReport.get("inactivePeriods").get(0).get("period").asText(), is("2015-09-02T12:00:00 UTC - 2015-09-02T13:00:00 UTC"));
     }
 
     @Test
@@ -376,7 +376,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
         assertThat(userReport.get("userName").asText(), is("Jim"));
         assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:00:00 UTC"));
         assertThat(userReport.get("endTime").asText(), is("2015-09-02T18:00:00 UTC"));
@@ -408,7 +408,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
         assertThat(userReport.get("userName").asText(), is("Jim"));
         assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:00:00 UTC"));
         assertThat(userReport.get("endTime").asText(), is("2015-09-02T18:00:00 UTC"));
@@ -417,10 +417,10 @@ public class UseCasesTest {
         assertThat(userReport.get("workDuration").asText(), is("10:00:00"));
         assertThat(userReport.get("hasErrors").asBoolean(), is(false));
         assertThat(userReport.get("inactivePeriods").size(), is(4));
-        assertThat(userReport.get("inactivePeriods").get(0).asText(), is("2015-09-02T08:00:00 UTC - 2015-09-02T08:00:01 UTC"));
-        assertThat(userReport.get("inactivePeriods").get(1).asText(), is("2015-09-02T12:00:00 UTC - 2015-09-02T13:00:00 UTC"));
-        assertThat(userReport.get("inactivePeriods").get(2).asText(), is("2015-09-02T13:00:00 UTC - 2015-09-02T13:00:01 UTC"));
-        assertThat(userReport.get("inactivePeriods").get(3).asText(), is("2015-09-02T15:00:00 UTC - 2015-09-02T16:00:00 UTC"));
+        assertThat(userReport.get("inactivePeriods").get(0).get("period").asText(), is("2015-09-02T08:00:00 UTC - 2015-09-02T08:00:01 UTC"));
+        assertThat(userReport.get("inactivePeriods").get(1).get("period").asText(), is("2015-09-02T12:00:00 UTC - 2015-09-02T13:00:00 UTC"));
+        assertThat(userReport.get("inactivePeriods").get(2).get("period").asText(), is("2015-09-02T13:00:00 UTC - 2015-09-02T13:00:01 UTC"));
+        assertThat(userReport.get("inactivePeriods").get(3).get("period").asText(), is("2015-09-02T15:00:00 UTC - 2015-09-02T16:00:00 UTC"));
     }
 
     @Test
@@ -457,7 +457,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("2015-09-02T00:00:00 UTC").get(0);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
 
         assertThat(userReport.get("userName").asText(), is("Ji{}/[]\"/m Ryan"));
         assertThat(userReport.get("startTime").asText(), is("2015-09-02T08:00:00 UTC"));

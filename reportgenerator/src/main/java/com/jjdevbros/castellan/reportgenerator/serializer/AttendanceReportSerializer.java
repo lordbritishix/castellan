@@ -1,5 +1,15 @@
 package com.jjdevbros.castellan.reportgenerator.serializer;
 
+import com.jjdevbros.castellan.common.Constants;
+import com.jjdevbros.castellan.common.EventModel;
+import com.jjdevbros.castellan.common.InactivePeriod;
+import com.jjdevbros.castellan.common.SessionPeriod;
+import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
+import com.jjdevbros.castellan.reportgenerator.report.UserReport;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.map.JsonSerializer;
+import org.codehaus.jackson.map.SerializerProvider;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -10,15 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.map.JsonSerializer;
-import org.codehaus.jackson.map.SerializerProvider;
-import com.jjdevbros.castellan.common.Constants;
-import com.jjdevbros.castellan.common.EventModel;
-import com.jjdevbros.castellan.common.InactivePeriod;
-import com.jjdevbros.castellan.common.SessionPeriod;
-import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
-import com.jjdevbros.castellan.reportgenerator.report.UserReport;
 
 /**
  * Created by lordbritishix on 06/09/15.
@@ -42,42 +43,35 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
         writeInstant("sessionStart",
                 attendanceReport.getPeriod().getStartTime().toInstant(ZoneOffset.UTC), jsonGenerator);
         writeInstant("sessionEnd", attendanceReport.getPeriod().getEndTime().toInstant(ZoneOffset.UTC), jsonGenerator);
+        writeUserReports(attendanceReport.getUserReports(), jsonGenerator);
 
-        jsonGenerator.writeArrayFieldStart("sessions");
-
-        attendanceReport.getUserReports().keySet().forEach(s -> {
-                    try {
-                        jsonGenerator.writeString(SF.format(Date.from(s.getStartTime().toInstant(ZoneOffset.UTC))));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-        );
-        jsonGenerator.writeEndArray();
+        jsonGenerator.writeEndObject();
+    }
 
 
+    private void writeUserReports(Map<SessionPeriod, List<UserReport>> userReportsMap, JsonGenerator jsonGenerator)
+            throws IOException {
         jsonGenerator.writeArrayFieldStart("userReports");
-        Map<SessionPeriod, List<UserReport>> reports = attendanceReport.getUserReports();
 
-        for (SessionPeriod key : reports.keySet()) {
+        for (SessionPeriod key : userReportsMap.keySet()) {
             jsonGenerator.writeStartObject();
-            jsonGenerator.writeFieldName(
+            jsonGenerator.writeStringField("userReportSessionStart",
                     SF.format(Date.from(key.getStartTime().toInstant(ZoneOffset.UTC))));
-            jsonGenerator.writeStartArray();
-
-            List<UserReport> userReports = reports.get(key);
+            jsonGenerator.writeStringField("userReportSessionEnd",
+                    SF.format(Date.from(key.getEndTime().toInstant(ZoneOffset.UTC))));
+            jsonGenerator.writeArrayFieldStart("report");
+            List<UserReport> userReports = userReportsMap.get(key);
 
             for (UserReport userReport : userReports) {
                 writeUserReport(userReport, jsonGenerator);
             }
-
             jsonGenerator.writeEndArray();
             jsonGenerator.writeEndObject();
         }
 
         jsonGenerator.writeEndArray();
-        jsonGenerator.writeEndObject();
     }
+
 
     private void writeUserReport(UserReport userReport, JsonGenerator generator) throws IOException {
         generator.writeStartObject();
@@ -94,11 +88,6 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
             writeInactivePeriod(inactivePeriod, generator);
         }
         generator.writeEndArray();
-        generator.writeArrayFieldStart("inactivePeriodDurations");
-        for (InactivePeriod inactivePeriod : userReport.getInactivePeriods()) {
-            writeDuration(inactivePeriod, generator);
-        }
-        generator.writeEndArray();
 
         generator.writeStringField("src", sourceEventsFormatter(userReport.getSourceEvents()));
         generator.writeEndObject();
@@ -113,15 +102,19 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
 
 
     private void writeInactivePeriod(InactivePeriod period, JsonGenerator generator) throws IOException {
+        generator.writeStartObject();
         if (period == null) {
-            generator.writeString(Constants.EN_DASH);
+            generator.writeStringField("period", Constants.EN_DASH);
+            generator.writeStringField("duration", Constants.EN_DASH);
         }
         else {
             String formattedPeriod = String.format("%s - %s",
                     SF.format(Date.from(period.getStart().toInstant(ZoneOffset.UTC))),
                     SF.format(Date.from(period.getEnd().toInstant(ZoneOffset.UTC))));
-            generator.writeString(formattedPeriod);
+            generator.writeStringField("period", formattedPeriod);
+            generator.writeStringField("duration", toFormattedDuration(period.getDuration()));
         }
+        generator.writeEndObject();
     }
 
     private void writeInstant(String key, Instant value, JsonGenerator generator) throws IOException {
@@ -138,21 +131,13 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
             generator.writeStringField(key, Constants.EN_DASH);
         }
         else {
-            long sec = value.getSeconds();
-            String duration = String.format("%d:%02d:%02d", sec / 3600, (sec % 3600) / 60, (sec % 60));
-            generator.writeStringField(key, duration);
+            generator.writeStringField(key, toFormattedDuration(value));
         }
     }
 
-    private void writeDuration(InactivePeriod period, JsonGenerator generator) throws IOException {
-        if (period == null) {
-            generator.writeString(Constants.EN_DASH);
-        }
-        else {
-            long sec = period.getDuration().getSeconds();
-            String duration = String.format("%d:%02d:%02d", sec / 3600, (sec % 3600) / 60, (sec % 60));
-            generator.writeString(duration);
-        }
+    private String toFormattedDuration(Duration duration) {
+        long sec = duration.getSeconds();
+        return String.format("%d:%02d:%02d", sec / 3600, (sec % 3600) / 60, (sec % 60));
     }
 
 

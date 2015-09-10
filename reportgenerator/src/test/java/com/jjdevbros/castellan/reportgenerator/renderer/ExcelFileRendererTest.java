@@ -2,6 +2,8 @@ package com.jjdevbros.castellan.reportgenerator.renderer;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -50,8 +52,8 @@ public class ExcelFileRendererTest {
                 buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-03T18:00:00.00Z", "Jeff")
                 );
 
-//        Path dir = Paths.get("/home/jim.quitevis/tmp");
-        renderer.write(createAttendanceReport(events), Files.createTempFile("report", ".pdf"));
+        Path dir = Paths.get("/home/lordbritishix/tmp");
+        renderer.write(createAttendanceReport(events), Files.createTempFile(dir, "report", ".pdf"));
     }
 
     private AttendanceReport createAttendanceReport(List<EventModel> events) throws IOException {

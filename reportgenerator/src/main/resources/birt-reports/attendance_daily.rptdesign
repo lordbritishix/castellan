@@ -73,9 +73,7 @@ jsonData = mapper.readTree(input);]]></method>
             <method name="fetch"><![CDATA[if (ctr < 1) {
 	row.reportId = jsonData.get("reportId").asText();
 	row.reportGeneratedAt = jsonData.get("reportedGeneratedAt").asText();
-	
-	System.out.println("@@@@@@@@a" + jsonData.get("userReports").asText());
-	
+
 	ctr++;
 	
 	return true;
@@ -207,61 +205,43 @@ importPackage(Packages.org.codehaus.jackson.map);
 importPackage(Packages.org.codehaus.jackson);
 
 ctr = 0;
-System.out.println("Generating Attendance data setfrom " + params["dataSource"].value);
+System.out.println("Generating attendance dataset from " + params["dataSource"].value);
 
 input = new String(Files.readAllBytes(Paths.get(params["dataSource"].value)));
 mapper = new ObjectMapper();
 root = mapper.readTree(input);
 
-sessions = root.get("sessions");
-userReports = root.get("userReports").get(0);
-
 //Only concerned about daily report, so only get the first session
-session = sessions.get(0);
-userReportPerUser = userReports.get(session.asText());
+userReport = root.get("userReports").get(0);
+report = userReport.get("report");]]></method>
+            <method name="fetch"><![CDATA[if (ctr < report.size()) {   
+    reportData = report.get(ctr);
 
-]]></method>
-            <method name="fetch"><![CDATA[if (ctr < userReportPerUser.size()) {
-    session = sessions.get(ctr);
-    userReport = userReportPerUser.get(ctr);
+    row.userName = reportData.get("userName").asText();
+    row.start = reportData.get("startTime").asText();
+    row.end = reportData.get("endTime").asText();
+    row.activityDuration = reportData.get("activityDuration").asText();
+    row.workDuration = reportData.get("workDuration").asText();
     
-    row.userName = userReport.get("userName").asText();
-    row.start = userReport.get("startTime").asText();
-    row.end = userReport.get("endTime").asText();
-    row.activityDuration = userReport.get("activityDuration").asText();
-    row.workDuration = userReport.get("workDuration").asText();
-    
-    size = userReport.path("inactivePeriods").size();
+    size = reportData.path("inactivePeriods").size();
     
     row.inactivePeriods = "";
+    row.inactivePeriodDurations = "";
     
     if (size <= 0) {
         row.inactivePeriods = "None";
+        row.inactivePeriodDurations = "";        
     }
     else {
 	    for (x = 0; x < size; ++x) {
-	        row.inactivePeriods += userReport.path("inactivePeriods").path(x).asText();  
+	        row.inactivePeriods += reportData.path("inactivePeriods").path(x).get("period").asText();  
 	        row.inactivePeriods += "\n";  
+	        
+            row.inactivePeriodDurations += reportData.path("inactivePeriods").path(x).get("duration").asText();  
+            row.inactivePeriodDurations += "\n";  	        
 	    }
     }
     
-    size = userReport.path("inactivePeriodDurations").size();        
-    row.inactivePeriodDurations = "";
-
-    System.out.println(userReport.path("inactivePeriodDurations").size());
-
-    if (size <= 0) {
-        row.inactivePeriodDurations = "";
-    }
-    else {
-        for (x = 0; x < size; ++x) {
-            row.inactivePeriodDurations += userReport.path("inactivePeriodDurations").path(x).asText();  
-            row.inactivePeriodDurations += "\n";  
-        }
-    }
-
-    row.inactiveDuration = userReport.get("inactivityDuration").asText();        
-
     ctr++;
     return true;
 }

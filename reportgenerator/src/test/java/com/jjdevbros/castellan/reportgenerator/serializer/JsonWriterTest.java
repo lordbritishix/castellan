@@ -67,8 +67,8 @@ public class JsonWriterTest {
         assertThat(jsonNode.get("sessionEnd").asText(), is("2015-09-04T00:00:00 UTC"));
 
         assertThat(jsonNode.get("userReports").size(), is(2));
-        assertThat(jsonNode.get("userReports").get(0).get("2015-09-02T00:00:00 UTC"), notNullValue());
-        assertThat(jsonNode.get("userReports").get(1).get("2015-09-03T00:00:00 UTC"), notNullValue());
+        assertThat(jsonNode.get("userReports").get(0).get("report"), notNullValue());
+        assertThat(jsonNode.get("userReports").get(1).get("report"), notNullValue());
     }
 
     private EventModel buildTestEvent(WindowsLogEventId eventId, String timestamp, String username) {
