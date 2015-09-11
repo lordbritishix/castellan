@@ -59,7 +59,7 @@ public class ExcelFileRendererTest {
                 buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-03T18:00:00.00Z", "Jeff")
         );
 
-//      Path dir = Paths.get("/home/lordbritishix/tmp");
+//        Path dir = Paths.get("/home/lordbritishix/tmp");
         renderer.write(createAttendanceReport(events), Files.createTempFile("report", ".pdf"));
     }
 

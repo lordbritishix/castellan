@@ -8,7 +8,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class SessionPeriodTest {
     private SessionPeriod fixture;
@@ -65,7 +67,7 @@ public class SessionPeriodTest {
 
     @Test
     public void testGetDurationReturnsCorrectDuration() {
-        assertThat(fixture.getDuration().getDays(), is(5));
+        assertThat(fixture.getDaysInBetween(), is(5L));
     }
 
 }

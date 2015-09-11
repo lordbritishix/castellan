@@ -1,11 +1,13 @@
 package com.jjdevbros.castellan.reportgenerator.serializer;
 
+import com.google.common.collect.Lists;
 import com.jjdevbros.castellan.common.Constants;
 import com.jjdevbros.castellan.common.EventModel;
 import com.jjdevbros.castellan.common.InactivePeriod;
 import com.jjdevbros.castellan.common.SessionPeriod;
 import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
 import com.jjdevbros.castellan.reportgenerator.report.UserReport;
+import com.jjdevbros.castellan.reportgenerator.session.SessionPeriodSpliterator;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
@@ -16,6 +18,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -43,15 +46,31 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
         writeInstant("sessionStart",
                 attendanceReport.getPeriod().getStartTime().toInstant(ZoneOffset.UTC), jsonGenerator);
         writeInstant("sessionEnd", attendanceReport.getPeriod().getEndTime().toInstant(ZoneOffset.UTC), jsonGenerator);
-        writeUserReports(attendanceReport.getUserReports(), jsonGenerator);
+        writeUserReports(attendanceReport, jsonGenerator);
 
         jsonGenerator.writeEndObject();
     }
 
 
-    private void writeUserReports(Map<SessionPeriod, List<UserReport>> userReportsMap, JsonGenerator jsonGenerator)
+    private void writeUserReports(AttendanceReport attendanceReport, JsonGenerator jsonGenerator)
             throws IOException {
         jsonGenerator.writeArrayFieldStart("userReports");
+
+        SessionPeriodSpliterator spliterator = new SessionPeriodSpliterator();
+        List<SessionPeriod> sessions = spliterator.splitDaily(attendanceReport.getPeriod());
+
+        Map<SessionPeriod, List<UserReport>> userReportsMap = new LinkedHashMap<>();
+
+        for (SessionPeriod session : sessions) {
+            userReportsMap.put(session, Lists.newArrayList());
+        }
+
+        for (SessionPeriod session : attendanceReport.getUserReports().keySet()) {
+            List<UserReport> report = userReportsMap.get(session);
+            if (report != null) {
+                userReportsMap.put(session, attendanceReport.getUserReports().get(session));
+            }
+        }
 
         for (SessionPeriod key : userReportsMap.keySet()) {
             jsonGenerator.writeStartObject();

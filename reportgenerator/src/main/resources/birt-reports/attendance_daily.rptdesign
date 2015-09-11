@@ -570,17 +570,16 @@ ctr = 0;]]></method>
                                 <property name="resultSetColumn">activityDuration</property>
                             </data>
                         </cell>
-                        <cell id="295"/>
+                        <cell id="295">
+                            <data id="317">
+                                <property name="fontStyle">italic</property>
+                                <property name="resultSetColumn">error</property>
+                            </data>
+                        </cell>
                         <cell id="305"/>
                     </row>
                 </grid>
             </detail>
-            <footer>
-                <data id="317">
-                    <property name="fontStyle">italic</property>
-                    <property name="resultSetColumn">error</property>
-                </data>
-            </footer>
         </list>
     </body>
 </report>
