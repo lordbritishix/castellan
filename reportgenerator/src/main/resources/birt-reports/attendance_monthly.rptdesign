@@ -3,10 +3,363 @@
     <property name="createdBy">Eclipse BIRT Designer Version 4.5.0.v201506092134 Build &lt;@BUILD@></property>
     <property name="units">in</property>
     <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="layoutPreference">fixed layout</property>
     <property name="bidiLayoutOrientation">ltr</property>
     <property name="imageDPI">96</property>
+    <parameters>
+        <scalar-parameter name="dataSource" id="14">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <script-data-source name="MonthlyAttendanceSource" id="15"/>
+    </data-sources>
+    <data-sets>
+        <script-data-set name="UserReport" id="16">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">userName</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">startTime</property>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">endTime</property>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">inactivityDuration</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">activityDuration</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">workDuration</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">hasErrors</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">errorDescription</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">session</property>
+                    <property name="dataType">date-time</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">userName</property>
+                </structure>
+                <structure>
+                    <property name="columnName">startTime</property>
+                </structure>
+                <structure>
+                    <property name="columnName">endTime</property>
+                </structure>
+                <structure>
+                    <property name="columnName">inactivityDuration</property>
+                </structure>
+                <structure>
+                    <property name="columnName">activityDuration</property>
+                </structure>
+                <structure>
+                    <property name="columnName">workDuration</property>
+                </structure>
+                <structure>
+                    <property name="columnName">hasErrors</property>
+                </structure>
+                <structure>
+                    <property name="columnName">errorDescription</property>
+                </structure>
+                <structure>
+                    <property name="columnName">session</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">userName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">startTime</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">endTime</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">inactivityDuration</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">activityDuration</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">workDuration</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">hasErrors</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">errorDescription</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">session</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">MonthlyAttendanceSource</property>
+            <method name="open"><![CDATA[importPackage(Packages.java.nio.file); 
+importPackage(Packages.java.lang); 
+importPackage(Packages.org.codehaus.jackson.map);
+importPackage(Packages.org.codehaus.jackson);
+
+
+sessionCtr = 0;
+userReportCtr = 0;
+
+System.out.println("Generating UserReport dataset from " + params["dataSource"].value);
+
+input = new String(Files.readAllBytes(Paths.get(params["dataSource"].value)));
+mapper = new ObjectMapper();
+root = mapper.readTree(input);
+
+sessions = root.get("userReports");]]></method>
+            <method name="fetch"><![CDATA[if (sessionCtr < sessions.size()) {   
+    //Get session
+    session = sessions.get(sessionCtr);    
+        
+    //Get user report per sessioon
+    userReports = session.get("report");
+    
+    if (userReports.size() <= 0) {
+        row.session = session.get("userReportSessionStart").asText();
+        sessionCtr++;          
+    }
+    else {
+	    if (userReportCtr < userReports.size()) {
+	        userReport = userReports.get(userReportCtr);    
+	        row.session = session.get("userReportSessionStart").asText();	        	        
+		    row.userName = userReport.get("userName").asText();		    
+		    row.startTime = userReport.get("startTime").asText();
+		    row.endTime = userReport.get("endTime").asText();
+		    row.activityDuration = userReport.get("activityDuration").asText();
+		    row.workDuration = userReport.get("workDuration").asText();		    
+		    userReportCtr++;
+	    }
+	    else {
+	        userReportCtr = 0;    
+	        sessionCtr++;
+	    }
+    }
+        
+    return true;
+}
+
+return false;]]></method>
+        </script-data-set>
+        <script-data-set name="AttendanceDataSet" id="17">
+            <list-property name="resultSetHints">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">reportGeneratedAt</property>
+                    <property name="dataType">date-time</property>
+                </structure>
+            </list-property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">reportGeneratedAt</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">reportGeneratedAt</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">MonthlyAttendanceSource</property>
+            <method name="open"><![CDATA[importPackage(Packages.java.nio.file); 
+importPackage(Packages.java.lang); 
+importPackage(Packages.org.codehaus.jackson.map);
+importPackage(Packages.org.codehaus.jackson);
+
+ctr = 0;
+
+System.out.println("Generating UserReport dataset from " + params["dataSource"].value);
+
+input = new String(Files.readAllBytes(Paths.get(params["dataSource"].value)));
+mapper = new ObjectMapper();
+jsonData = mapper.readTree(input);]]></method>
+            <method name="fetch"><![CDATA[if (ctr < 1) {
+    row.reportGeneratedAt = jsonData.get("reportedGeneratedAt").asText();
+    
+    ctr++;
+    
+    return true;
+}
+
+return false;]]></method>
+        </script-data-set>
+    </data-sets>
+    <cubes>
+        <tabular-cube name="AttendanceMonthlyCube" id="24">
+            <property name="dimensions">
+                <tabular-dimension name="userName" id="25">
+                    <property name="defaultHierarchy">NewTabularHierarchy</property>
+                    <property name="hierarchies">
+                        <tabular-hierarchy name="NewTabularHierarchy" id="26">
+                            <property name="levels">
+                                <tabular-level name="userName" id="27">
+                                    <property name="dataType">string</property>
+                                    <property name="columnName">userName</property>
+                                </tabular-level>
+                            </property>
+                        </tabular-hierarchy>
+                    </property>
+                </tabular-dimension>
+                <tabular-dimension name="session" id="32">
+                    <property name="isTimeType">false</property>
+                    <property name="defaultHierarchy">NewTabularHierarchy3</property>
+                    <property name="hierarchies">
+                        <tabular-hierarchy name="NewTabularHierarchy3" id="33">
+                            <property name="levels">
+                                <tabular-level name="session" id="34">
+                                    <property name="dataType">date-time</property>
+                                    <property name="columnName">session</property>
+                                </tabular-level>
+                            </property>
+                        </tabular-hierarchy>
+                    </property>
+                </tabular-dimension>
+                <tabular-dimension name="startTime" id="106">
+                    <property name="isTimeType">false</property>
+                    <property name="defaultHierarchy">NewTabularHierarchy2</property>
+                    <property name="hierarchies">
+                        <tabular-hierarchy name="NewTabularHierarchy2" id="107">
+                            <property name="levels">
+                                <tabular-level name="startTime" id="108">
+                                    <property name="dataType">date-time</property>
+                                    <property name="columnName">startTime</property>
+                                </tabular-level>
+                            </property>
+                        </tabular-hierarchy>
+                    </property>
+                </tabular-dimension>
+                <tabular-dimension name="endTime" id="109">
+                    <property name="isTimeType">false</property>
+                    <property name="defaultHierarchy">NewTabularHierarchy5</property>
+                    <property name="hierarchies">
+                        <tabular-hierarchy name="NewTabularHierarchy5" id="110">
+                            <property name="levels">
+                                <tabular-level name="endTime" id="111">
+                                    <property name="dataType">date-time</property>
+                                    <property name="columnName">endTime</property>
+                                </tabular-level>
+                            </property>
+                        </tabular-hierarchy>
+                    </property>
+                </tabular-dimension>
+            </property>
+            <property name="measureGroups">
+                <tabular-measure-group name="Summary Field" id="35">
+                    <property name="measures">
+                        <tabular-measure name="workDuration" id="78">
+                            <property name="function">first</property>
+                            <property name="isCalculated">false</property>
+                            <expression name="measureExpression" type="javascript">dataSetRow["workDuration"]</expression>
+                            <property name="dataType">string</property>
+                            <property name="isVisible">true</property>
+                        </tabular-measure>
+                    </property>
+                </tabular-measure-group>
+            </property>
+            <property name="dataSet">UserReport</property>
+        </tabular-cube>
+    </cubes>
     <page-setup>
         <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">custom</property>
+            <property name="orientation">landscape</property>
+            <property name="height">8.5in</property>
+            <property name="width">20in</property>
+            <page-header>
+                <grid id="7">
+                    <column id="8"/>
+                    <column id="9"/>
+                    <row id="10">
+                        <cell id="11">
+                            <label id="13">
+                                <property name="fontSize">x-large</property>
+                                <text-property name="text">Attendance</text-property>
+                            </label>
+                        </cell>
+                        <cell id="12">
+                            <data id="18">
+                                <property name="fontSize">x-large</property>
+                                <structure name="dateTimeFormat">
+                                    <property name="category">Custom</property>
+                                    <property name="pattern">MMMM y</property>
+                                </structure>
+                                <property name="textAlign">right</property>
+                                <property name="dataSet">AttendanceDataSet</property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">reportGeneratedAt</property>
+                                        <text-property name="displayName">reportGeneratedAt</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["reportGeneratedAt"]</expression>
+                                        <property name="dataType">date-time</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">reportGeneratedAt</property>
+                            </data>
+                        </cell>
+                    </row>
+                </grid>
+            </page-header>
             <page-footer>
                 <text id="3">
                     <property name="contentType">html</property>
@@ -16,9 +369,106 @@
         </simple-master-page>
     </page-setup>
     <body>
-        <label id="4">
-            <property name="fontSize">x-large</property>
-            <text-property name="text">Attendance Report</text-property>
-        </label>
+        <extended-item extensionName="Crosstab" extensionVersion="3.7.0" id="86">
+            <property name="cube">AttendanceMonthlyCube</property>
+            <property name="measures">
+                <extended-item extensionName="MeasureView" id="99">
+                    <property name="measure">workDuration</property>
+                    <property name="detail">
+                        <extended-item extensionName="AggregationCell" id="100">
+                            <property name="aggregationOnRow">userName/userName</property>
+                            <property name="aggregationOnColumn">session/session</property>
+                            <property name="content">
+                                <data id="101">
+                                    <property name="fontSize">x-small</property>
+                                    <property name="resultSetColumn">workDuration_userName/userName_session/session</property>
+                                </data>
+                            </property>
+                        </extended-item>
+                    </property>
+                    <property name="header">
+                        <extended-item extensionName="CrosstabCell" id="102"/>
+                    </property>
+                </extended-item>
+            </property>
+            <property name="rows">
+                <extended-item extensionName="CrosstabView" id="88">
+                    <property name="views">
+                        <extended-item extensionName="DimensionView" id="89">
+                            <property name="dimension">userName</property>
+                            <property name="levels">
+                                <extended-item extensionName="LevelView" name="NewLevel View" id="90">
+                                    <property name="level">userName/userName</property>
+                                    <property name="member">
+                                        <extended-item extensionName="CrosstabCell" id="91">
+                                            <property name="content">
+                                                <data name="userName" id="92">
+                                                    <property name="fontSize">smaller</property>
+                                                    <property name="resultSetColumn">userName</property>
+                                                </data>
+                                            </property>
+                                        </extended-item>
+                                    </property>
+                                </extended-item>
+                            </property>
+                        </extended-item>
+                    </property>
+                </extended-item>
+            </property>
+            <property name="columns">
+                <extended-item extensionName="CrosstabView" id="94">
+                    <property name="views">
+                        <extended-item extensionName="DimensionView" id="95">
+                            <property name="dimension">session</property>
+                            <property name="levels">
+                                <extended-item extensionName="LevelView" name="NewLevel View1" id="96">
+                                    <property name="level">session/session</property>
+                                    <property name="member">
+                                        <extended-item extensionName="CrosstabCell" id="97">
+                                            <property name="content">
+                                                <data name="session" id="98">
+                                                    <property name="fontSize">x-small</property>
+                                                    <structure name="dateTimeFormat">
+                                                        <property name="category">Custom</property>
+                                                        <property name="pattern">E MMM d</property>
+                                                    </structure>
+                                                    <property name="resultSetColumn">session</property>
+                                                </data>
+                                            </property>
+                                        </extended-item>
+                                    </property>
+                                </extended-item>
+                            </property>
+                        </extended-item>
+                    </property>
+                </extended-item>
+            </property>
+            <property name="header">
+                <extended-item extensionName="CrosstabCell" id="104"/>
+                <extended-item extensionName="CrosstabCell" id="87"/>
+            </property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">userName</property>
+                    <expression name="expression">dimension["userName"]["userName"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">session</property>
+                    <expression name="expression">dimension["session"]["session"]</expression>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="name">workDuration_userName/userName_session/session</property>
+                    <expression name="expression">measure["workDuration"]</expression>
+                    <property name="dataType">string</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>userName/userName</value>
+                        <value>session/session</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">FIRST</property>
+                </structure>
+            </list-property>
+        </extended-item>
     </body>
 </report>

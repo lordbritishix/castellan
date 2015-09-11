@@ -33,7 +33,7 @@ public class ExcelFileRenderer {
     public void write(AttendanceReport report, Path outputPath) throws IOException, BirtException {
         log.info("Generating report: " + outputPath.toString());
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("birt-reports/attendance_daily.rptdesign").getFile());
+        File file = new File(classLoader.getResource("birt-reports/attendance_monthly.rptdesign").getFile());
         List<?> errors = Lists.newArrayList();
 
         byte[] data = null;

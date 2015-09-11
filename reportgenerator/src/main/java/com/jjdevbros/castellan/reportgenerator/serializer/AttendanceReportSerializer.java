@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * It is formatted in a way that it gets written directly to the report without much transformation (ideally)
  */
 public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport> {
-    private static final SimpleDateFormat SF = new SimpleDateFormat();
+    private static final SimpleDateFormat SF = new SimpleDateFormat("MM/dd/yy h:mm a");
     private static final SimpleDateFormat SF_INACTIVITY = new SimpleDateFormat("kk:mm:ss");
 
     public AttendanceReportSerializer() {

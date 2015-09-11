@@ -218,7 +218,7 @@ importPackage(Packages.org.codehaus.jackson.map);
 importPackage(Packages.org.codehaus.jackson);
 
 ctr = 0;
-System.out.println("Generating attendance dataset from " + params["dataSource"].value);
+System.out.println("Generating UserReport dataset from " + params["dataSource"].value);
 
 input = new String(Files.readAllBytes(Paths.get(params["dataSource"].value)));
 mapper = new ObjectMapper();
