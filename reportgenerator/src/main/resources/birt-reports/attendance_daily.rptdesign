@@ -32,7 +32,7 @@
                 <structure>
                     <property name="position">2</property>
                     <property name="name">reportGeneratedAt</property>
-                    <property name="dataType">string</property>
+                    <property name="dataType">date-time</property>
                 </structure>
             </list-property>
             <list-property name="columnHints">
@@ -53,7 +53,7 @@
                     <structure>
                         <property name="position">2</property>
                         <property name="name">reportGeneratedAt</property>
-                        <property name="dataType">string</property>
+                        <property name="dataType">date-time</property>
                     </structure>
                 </list-property>
             </structure>
@@ -90,12 +90,12 @@ ctr = 0;]]></method>
                 <structure>
                     <property name="position">1</property>
                     <property name="name">start</property>
-                    <property name="dataType">string</property>
+                    <property name="dataType">date-time</property>
                 </structure>
                 <structure>
                     <property name="position">2</property>
                     <property name="name">end</property>
-                    <property name="dataType">string</property>
+                    <property name="dataType">date-time</property>
                 </structure>
                 <structure>
                     <property name="position">3</property>
@@ -167,12 +167,12 @@ ctr = 0;]]></method>
                     <structure>
                         <property name="position">1</property>
                         <property name="name">start</property>
-                        <property name="dataType">string</property>
+                        <property name="dataType">date-time</property>
                     </structure>
                     <structure>
                         <property name="position">2</property>
                         <property name="name">end</property>
-                        <property name="dataType">string</property>
+                        <property name="dataType">date-time</property>
                     </structure>
                     <structure>
                         <property name="position">3</property>
@@ -259,6 +259,8 @@ report = userReport.get("report");]]></method>
         row.error = "Note: " + reportData.get("errorDescription").asText();
     }
     
+    row.inactiveDuration = reportData.path("inactivityDuration").asText();
+    
     ctr++;
     return true;
 }
@@ -285,8 +287,12 @@ ctr = 0;]]></method>
                             </label>
                         </cell>
                         <cell id="114">
-                            <data id="182">
+                            <data id="318">
                                 <property name="fontSize">x-large</property>
+                                <structure name="dateTimeFormat">
+                                    <property name="category">Long Date</property>
+                                    <property name="pattern">Long Date</property>
+                                </structure>
                                 <property name="textAlign">right</property>
                                 <property name="dataSet">AttendanceDataSet</property>
                                 <list-property name="boundDataColumns">
@@ -294,7 +300,7 @@ ctr = 0;]]></method>
                                         <property name="name">reportGeneratedAt</property>
                                         <text-property name="displayName">reportGeneratedAt</text-property>
                                         <expression name="expression" type="javascript">dataSetRow["reportGeneratedAt"]</expression>
-                                        <property name="dataType">string</property>
+                                        <property name="dataType">date-time</property>
                                     </structure>
                                 </list-property>
                                 <property name="resultSetColumn">reportGeneratedAt</property>
@@ -319,13 +325,15 @@ ctr = 0;]]></method>
                     <property name="name">start</property>
                     <text-property name="displayName">start</text-property>
                     <expression name="expression" type="javascript">dataSetRow["start"]</expression>
-                    <property name="dataType">string</property>
+                    <property name="dataType">date-time</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">end</property>
                     <text-property name="displayName">end</text-property>
                     <expression name="expression" type="javascript">dataSetRow["end"]</expression>
-                    <property name="dataType">string</property>
+                    <property name="dataType">date-time</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">activityDuration</property>
@@ -362,6 +370,18 @@ ctr = 0;]]></method>
                     <text-property name="displayName">error</text-property>
                     <expression name="expression" type="javascript">dataSetRow["error"]</expression>
                     <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">start_1</property>
+                    <text-property name="displayName">start</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["start"]</expression>
+                    <property name="dataType">date-time</property>
+                </structure>
+                <structure>
+                    <property name="name">end_1</property>
+                    <text-property name="displayName">end</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["end"]</expression>
+                    <property name="dataType">date-time</property>
                 </structure>
             </list-property>
             <detail>
@@ -455,7 +475,11 @@ ctr = 0;]]></method>
                             </label>
                         </cell>
                         <cell id="264">
-                            <data id="275">
+                            <data id="319">
+                                <structure name="dateTimeFormat">
+                                    <property name="category">Custom</property>
+                                    <property name="pattern">kk:mm:ss</property>
+                                </structure>
                                 <property name="resultSetColumn">start</property>
                             </data>
                         </cell>
@@ -507,7 +531,11 @@ ctr = 0;]]></method>
                             </label>
                         </cell>
                         <cell id="267">
-                            <data id="276">
+                            <data id="320">
+                                <structure name="dateTimeFormat">
+                                    <property name="category">Custom</property>
+                                    <property name="pattern">kk:mm:ss</property>
+                                </structure>
                                 <property name="resultSetColumn">end</property>
                             </data>
                         </cell>

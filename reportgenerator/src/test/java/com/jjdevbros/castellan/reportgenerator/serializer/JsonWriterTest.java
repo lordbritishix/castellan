@@ -63,8 +63,8 @@ public class JsonWriterTest {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(json);
         assertThat(jsonNode.get("reportId").asText(), is(attendanceReport.getReportId().toString()));
-        assertThat(jsonNode.get("sessionStart").asText(), is("2015-09-02T00:00:00 UTC"));
-        assertThat(jsonNode.get("sessionEnd").asText(), is("2015-09-04T00:00:00 UTC"));
+        assertThat(jsonNode.get("sessionStart").asText(), is("02/09/15 12:00 AM"));
+        assertThat(jsonNode.get("sessionEnd").asText(), is("04/09/15 12:00 AM"));
 
         assertThat(jsonNode.get("userReports").size(), is(2));
         assertThat(jsonNode.get("userReports").get(0).get("report"), notNullValue());

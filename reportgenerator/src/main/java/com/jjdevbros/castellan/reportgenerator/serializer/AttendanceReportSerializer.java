@@ -31,10 +31,12 @@ import java.util.stream.Collectors;
  * It is formatted in a way that it gets written directly to the report without much transformation (ideally)
  */
 public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport> {
-    private static final SimpleDateFormat SF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z");
+    private static final SimpleDateFormat SF = new SimpleDateFormat();
+    private static final SimpleDateFormat SF_INACTIVITY = new SimpleDateFormat("kk:mm:ss");
 
     public AttendanceReportSerializer() {
         SF.setTimeZone(TimeZone.getTimeZone("UTC"));
+        SF_INACTIVITY.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     @Override
@@ -123,13 +125,14 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
     private void writeInactivePeriod(InactivePeriod period, JsonGenerator generator) throws IOException {
         generator.writeStartObject();
         if (period == null) {
-            generator.writeStringField("period", Constants.EN_DASH);
-            generator.writeStringField("duration", Constants.EN_DASH);
+            generator.writeStringField("startInactivityPeriod", "");
+            generator.writeStringField("endInactivityPeriod", "");
+            generator.writeStringField("duration", "");
         }
         else {
             String formattedPeriod = String.format("%s - %s",
-                    SF.format(Date.from(period.getStart().toInstant(ZoneOffset.UTC))),
-                    SF.format(Date.from(period.getEnd().toInstant(ZoneOffset.UTC))));
+                    SF_INACTIVITY.format(Date.from(period.getStart().toInstant(ZoneOffset.UTC))),
+                    SF_INACTIVITY.format(Date.from(period.getEnd().toInstant(ZoneOffset.UTC))));
             generator.writeStringField("period", formattedPeriod);
             generator.writeStringField("duration", toFormattedDuration(period.getDuration()));
         }
@@ -141,7 +144,7 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
             generator.writeStringField(key, SF.format(Date.from(value)));
         }
         else {
-            generator.writeStringField(key, Constants.EN_DASH);
+            generator.writeStringField(key, "");
         }
     }
 
