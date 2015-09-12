@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="createdBy">Eclipse BIRT Designer Version 4.5.0.v201506092134 Build &lt;@BUILD@></property>
+    <list-property name="userProperties">
+        <structure>
+            <property name="name">AttendanceMonthlyCube.UserReport.x</property>
+            <property name="type">integer</property>
+            <property name="isVisible">false</property>
+        </structure>
+        <structure>
+            <property name="name">AttendanceMonthlyCube.UserReport.y</property>
+            <property name="type">integer</property>
+            <property name="isVisible">false</property>
+        </structure>
+    </list-property>
+    <property name="AttendanceMonthlyCube.UserReport.x">135</property>
+    <property name="AttendanceMonthlyCube.UserReport.y">80</property>
     <property name="units">in</property>
     <property name="iconFile">/templates/blank_report.gif</property>
     <property name="layoutPreference">fixed layout</property>
@@ -159,8 +173,6 @@ importPackage(Packages.org.codehaus.jackson);
 sessionCtr = 0;
 userReportCtr = 0;
 
-System.out.println("Generating UserReport dataset from " + params["dataSource"].value);
-
 input = new String(Files.readAllBytes(Paths.get(params["dataSource"].value)));
 mapper = new ObjectMapper();
 root = mapper.readTree(input);
@@ -174,7 +186,7 @@ sessions = root.get("userReports");]]></method>
     userReports = session.get("report");
     
     if (userReports.size() <= 0) {
-        row.session = session.get("userReportSessionStart").asText();
+        row.session = session.get("userReportSessionStart").asText();        
         sessionCtr++;          
     }
     else {
@@ -185,6 +197,7 @@ sessions = root.get("userReports");]]></method>
 		    row.startTime = userReport.get("startTime").asText();
 		    row.endTime = userReport.get("endTime").asText();
 		    row.activityDuration = userReport.get("activityDuration").asText();
+		    row.inactivityDuration = userReport.get("inactivityDuration").asText();
 		    row.workDuration = userReport.get("workDuration").asText();		    
 		    userReportCtr++;
 	    }
@@ -229,8 +242,6 @@ importPackage(Packages.org.codehaus.jackson);
 
 ctr = 0;
 
-System.out.println("Generating UserReport dataset from " + params["dataSource"].value);
-
 input = new String(Files.readAllBytes(Paths.get(params["dataSource"].value)));
 mapper = new ObjectMapper();
 jsonData = mapper.readTree(input);]]></method>
@@ -247,6 +258,13 @@ return false;]]></method>
     </data-sets>
     <cubes>
         <tabular-cube name="AttendanceMonthlyCube" id="24">
+            <list-property name="filter">
+                <structure>
+                    <property name="operator">is-not-null</property>
+                    <expression name="expr" type="javascript">dataSetRow["userName"]</expression>
+                    <property name="updateAggregation">true</property>
+                </structure>
+            </list-property>
             <property name="dimensions">
                 <tabular-dimension name="userName" id="25">
                     <property name="defaultHierarchy">NewTabularHierarchy</property>
@@ -275,34 +293,6 @@ return false;]]></method>
                         </tabular-hierarchy>
                     </property>
                 </tabular-dimension>
-                <tabular-dimension name="startTime" id="106">
-                    <property name="isTimeType">false</property>
-                    <property name="defaultHierarchy">NewTabularHierarchy2</property>
-                    <property name="hierarchies">
-                        <tabular-hierarchy name="NewTabularHierarchy2" id="107">
-                            <property name="levels">
-                                <tabular-level name="startTime" id="108">
-                                    <property name="dataType">date-time</property>
-                                    <property name="columnName">startTime</property>
-                                </tabular-level>
-                            </property>
-                        </tabular-hierarchy>
-                    </property>
-                </tabular-dimension>
-                <tabular-dimension name="endTime" id="109">
-                    <property name="isTimeType">false</property>
-                    <property name="defaultHierarchy">NewTabularHierarchy5</property>
-                    <property name="hierarchies">
-                        <tabular-hierarchy name="NewTabularHierarchy5" id="110">
-                            <property name="levels">
-                                <tabular-level name="endTime" id="111">
-                                    <property name="dataType">date-time</property>
-                                    <property name="columnName">endTime</property>
-                                </tabular-level>
-                            </property>
-                        </tabular-hierarchy>
-                    </property>
-                </tabular-dimension>
             </property>
             <property name="measureGroups">
                 <tabular-measure-group name="Summary Field" id="35">
@@ -314,10 +304,32 @@ return false;]]></method>
                             <property name="dataType">string</property>
                             <property name="isVisible">true</property>
                         </tabular-measure>
+                        <tabular-measure name="startTime" id="126">
+                            <property name="function">first</property>
+                            <property name="isCalculated">false</property>
+                            <expression name="measureExpression" type="javascript">dataSetRow["startTime"]</expression>
+                            <property name="dataType">string</property>
+                            <property name="isVisible">true</property>
+                        </tabular-measure>
+                        <tabular-measure name="endTime" id="137">
+                            <property name="function">first</property>
+                            <property name="isCalculated">false</property>
+                            <expression name="measureExpression" type="javascript">dataSetRow["endTime"]</expression>
+                            <property name="dataType">date-time</property>
+                            <property name="isVisible">true</property>
+                        </tabular-measure>
+                        <tabular-measure name="inactivityDuration" id="149">
+                            <property name="function">first</property>
+                            <property name="isCalculated">false</property>
+                            <expression name="measureExpression" type="javascript">dataSetRow["inactivityDuration"]</expression>
+                            <property name="dataType">string</property>
+                            <property name="isVisible">true</property>
+                        </tabular-measure>
                     </property>
                 </tabular-measure-group>
             </property>
             <property name="dataSet">UserReport</property>
+            <property name="autoKey">true</property>
         </tabular-cube>
     </cubes>
     <page-setup>
@@ -360,12 +372,6 @@ return false;]]></method>
                     </row>
                 </grid>
             </page-header>
-            <page-footer>
-                <text id="3">
-                    <property name="contentType">html</property>
-                    <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
-                </text>
-            </page-footer>
         </simple-master-page>
     </page-setup>
     <body>
@@ -378,10 +384,43 @@ return false;]]></method>
                         <extended-item extensionName="AggregationCell" id="100">
                             <property name="aggregationOnRow">userName/userName</property>
                             <property name="aggregationOnColumn">session/session</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">medium</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">medium</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">medium</property>
                             <property name="content">
-                                <data id="101">
-                                    <property name="fontSize">x-small</property>
+                                <label id="135"/>
+                                <data id="130">
+                                    <property name="fontSize">xx-small</property>
+                                    <structure name="dateTimeFormat">
+                                        <property name="category">Custom</property>
+                                        <property name="pattern">kk:mm:ss</property>
+                                    </structure>
+                                    <property name="resultSetColumn">startTime_userName/userName_session/session</property>
+                                </data>
+                                <data id="145">
+                                    <property name="fontSize">xx-small</property>
+                                    <structure name="dateTimeFormat">
+                                        <property name="category">Custom</property>
+                                        <property name="pattern">kk:mm:ss</property>
+                                    </structure>
+                                    <property name="resultSetColumn">endTime_userName/userName_session/session</property>
+                                </data>
+                                <data id="129">
+                                    <property name="fontSize">xx-small</property>
                                     <property name="resultSetColumn">workDuration_userName/userName_session/session</property>
+                                </data>
+                                <data id="153">
+                                    <property name="fontSize">xx-small</property>
+                                    <structure name="dateTimeFormat">
+                                        <property name="category">Custom</property>
+                                        <property name="pattern">kk:mm:ss</property>
+                                    </structure>
+                                    <property name="resultSetColumn">inactivityDuration_userName/userName_session/session</property>
                                 </data>
                             </property>
                         </extended-item>
@@ -399,14 +438,46 @@ return false;]]></method>
                             <property name="levels">
                                 <extended-item extensionName="LevelView" name="NewLevel View" id="90">
                                     <property name="level">userName/userName</property>
+                                    <property name="sort">
+                                        <sort-element>
+                                            <expression name="key" type="javascript">data["userName"]</expression>
+                                            <property name="direction">asc</property>
+                                            <property name="strength">-1</property>
+                                        </sort-element>
+                                    </property>
                                     <property name="member">
                                         <extended-item extensionName="CrosstabCell" id="91">
                                             <property name="content">
                                                 <data name="userName" id="92">
-                                                    <property name="fontSize">smaller</property>
+                                                    <property name="fontWeight">bold</property>
+                                                    <property name="textAlign">left</property>
                                                     <property name="resultSetColumn">userName</property>
                                                 </data>
+                                                <label id="134">
+                                                    <property name="fontSize">xx-small</property>
+                                                    <text-property name="text">IN</text-property>
+                                                </label>
+                                                <label id="136">
+                                                    <property name="fontSize">xx-small</property>
+                                                    <text-property name="text">OUT</text-property>
+                                                </label>
+                                                <label id="148">
+                                                    <property name="fontSize">xx-small</property>
+                                                    <text-property name="text">Work</text-property>
+                                                </label>
+                                                <label id="150">
+                                                    <property name="fontSize">xx-small</property>
+                                                    <text-property name="text">Inactive</text-property>
+                                                </label>
                                             </property>
+                                            <property name="borderTopStyle">solid</property>
+                                            <property name="borderTopWidth">medium</property>
+                                            <property name="borderLeftStyle">solid</property>
+                                            <property name="borderLeftWidth">medium</property>
+                                            <property name="borderBottomStyle">solid</property>
+                                            <property name="borderBottomWidth">medium</property>
+                                            <property name="borderRightStyle">solid</property>
+                                            <property name="borderRightWidth">medium</property>
                                         </extended-item>
                                     </property>
                                 </extended-item>
@@ -435,6 +506,14 @@ return false;]]></method>
                                                     <property name="resultSetColumn">session</property>
                                                 </data>
                                             </property>
+                                            <property name="borderTopStyle">solid</property>
+                                            <property name="borderTopWidth">medium</property>
+                                            <property name="borderLeftStyle">solid</property>
+                                            <property name="borderLeftWidth">medium</property>
+                                            <property name="borderBottomStyle">solid</property>
+                                            <property name="borderBottomWidth">medium</property>
+                                            <property name="borderRightStyle">solid</property>
+                                            <property name="borderRightWidth">medium</property>
                                         </extended-item>
                                     </property>
                                 </extended-item>
@@ -444,9 +523,19 @@ return false;]]></method>
                 </extended-item>
             </property>
             <property name="header">
-                <extended-item extensionName="CrosstabCell" id="104"/>
                 <extended-item extensionName="CrosstabCell" id="87"/>
             </property>
+            <property name="emptyCellValue">-</property>
+            <property name="hideMeasureHeader">true</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">medium</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">medium</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">medium</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">medium</property>
+            <structure name="toc"/>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">userName</property>
@@ -467,6 +556,46 @@ return false;]]></method>
                         <value>session/session</value>
                     </simple-property-list>
                     <property name="aggregateFunction">FIRST</property>
+                </structure>
+                <structure>
+                    <property name="name">startTime_userName/userName_session/session</property>
+                    <property name="dataType">date-time</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>userName/userName</value>
+                        <value>session/session</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">FIRST</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">measure["startTime"]</expression>
+                        </structure>
+                    </list-property>
+                </structure>
+                <structure>
+                    <property name="name">endTime_userName/userName_session/session</property>
+                    <expression name="expression">measure["endTime"]</expression>
+                    <property name="dataType">date-time</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>userName/userName</value>
+                        <value>session/session</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">FIRST</property>
+                </structure>
+                <structure>
+                    <property name="name">inactivityDuration_userName/userName_session/session</property>
+                    <property name="dataType">string</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>userName/userName</value>
+                        <value>session/session</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">FIRST</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">measure["inactivityDuration"]</expression>
+                        </structure>
+                    </list-property>
                 </structure>
             </list-property>
         </extended-item>

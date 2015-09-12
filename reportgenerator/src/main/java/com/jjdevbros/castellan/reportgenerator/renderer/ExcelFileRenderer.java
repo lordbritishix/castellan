@@ -1,5 +1,18 @@
 package com.jjdevbros.castellan.reportgenerator.renderer;
 
+import com.google.common.collect.Lists;
+import com.jjdevbros.castellan.common.specification.ReportSpecification;
+import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.birt.core.exception.BirtException;
+import org.eclipse.birt.core.framework.Platform;
+import org.eclipse.birt.report.engine.api.EXCELRenderOption;
+import org.eclipse.birt.report.engine.api.EngineConfig;
+import org.eclipse.birt.report.engine.api.IReportEngine;
+import org.eclipse.birt.report.engine.api.IReportEngineFactory;
+import org.eclipse.birt.report.engine.api.IReportRunnable;
+import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
+
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -11,29 +24,29 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
-import org.eclipse.birt.core.exception.BirtException;
-import org.eclipse.birt.core.framework.Platform;
-import org.eclipse.birt.report.engine.api.EXCELRenderOption;
-import org.eclipse.birt.report.engine.api.EngineConfig;
-import org.eclipse.birt.report.engine.api.IReportEngine;
-import org.eclipse.birt.report.engine.api.IReportEngineFactory;
-import org.eclipse.birt.report.engine.api.IReportRunnable;
-import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
-import com.google.common.collect.Lists;
-import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created by lordbritishix on 06/09/15.
  */
 @Slf4j
 public class ExcelFileRenderer {
-    public void write(AttendanceReport report, Path outputPath) throws IOException, BirtException {
+    private boolean hasDataToReport(AttendanceReport report) {
+        return report.getUserReports().keySet().stream()
+                    .filter(k -> report.getPeriod().isInSession(
+                            k.getStartTime().toInstant(ZoneOffset.UTC).toEpochMilli())).count() > 0;
+    }
+
+    public boolean write(AttendanceReport report, Path outputPath, ReportSpecification specification)
+            throws IOException, BirtException {
+        if (!hasDataToReport(report)) {
+            return false;
+        }
+
         log.info("Generating report: " + outputPath.toString());
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("birt-reports/attendance_monthly.rptdesign").getFile());
+        File file = new File(classLoader.getResource(specification.getReportTemplateName()).getFile());
         List<?> errors = Lists.newArrayList();
 
         byte[] data = null;
@@ -41,7 +54,7 @@ public class ExcelFileRenderer {
              InputStream in = new FileInputStream(file)) {
 
             JsonFileRenderer jsonFileRenderer = new JsonFileRenderer();
-            Path jsonOutput = Files.createTempFile("attendanceReport", ".json");
+            Path jsonOutput = Files.createTempFile(specification.getFileNamePrefix() + "_", ".json");
             jsonFileRenderer.write(report, jsonOutput);
 
             log.info("Reading data source from: " + jsonOutput);
@@ -86,5 +99,7 @@ public class ExcelFileRenderer {
                 }
             }
         }
+
+        return  true;
     }
 }
