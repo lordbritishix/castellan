@@ -1,6 +1,6 @@
 package com.jjdevbros.castellan.common;
 
-public enum  Session {
+public enum SessionType {
     DAILY,
     MONTHLY
 }

@@ -62,18 +62,14 @@
         <dependency>
             <groupId>org.eclipse.birt.runtime</groupId>
             <artifactId>org.eclipse.birt.runtime</artifactId>
-            <version>4.3.0</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>org.apache.poi</artifactId>
-                    <groupId>org.eclipse.birt.runtime</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>3.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
         </dependency>
     </dependencies>
 </project>
