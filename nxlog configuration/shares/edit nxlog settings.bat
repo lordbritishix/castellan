@@ -31,12 +31,12 @@ REG.exe Query %RegQry% > checkOS.txt
 Find /i "x86" < CheckOS.txt > StringCheck.txt
  
 If %ERRORLEVEL% == 0 (
-    xcopy /y /s \\jjdevbros.com\shares\32bit\nxlog.conf c:\windows\temp
+    xcopy /f /y \\jjdevbros.com\shares\32bit\nxlog.conf C:\"Program Files"\nxlog\conf\
     timeout /t 5 /nobreak
     net start "nxlog"
 
 ) ELSE (
-    xcopy /y /s \\jjdevbros.com\shares\64bit\nxlog.conf c:\windows\temp
+    xcopy /f /y \\jjdevbros.com\shares\64bit\nxlog.conf C:\"Program Files (x86)"\nxlog\conf\
     timeout /t 5 /nobreak
     net start "nxlog"
 
