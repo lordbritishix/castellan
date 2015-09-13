@@ -10,9 +10,9 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.*;
 import com.google.common.collect.ImmutableList;
-import com.jjdevbros.castellan.common.EventModel;
-import com.jjdevbros.castellan.common.SessionPeriod;
-import com.jjdevbros.castellan.common.WindowsLogEventId;
+import com.jjdevbros.castellan.common.model.EventModel;
+import com.jjdevbros.castellan.common.model.SessionPeriod;
+import com.jjdevbros.castellan.common.model.WindowsLogEventId;
 import com.jjdevbros.castellan.reportgenerator.generator.AttendanceReportGenerator;
 import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
 

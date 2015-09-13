@@ -1,6 +1,4 @@
-package com.jjdevbros.castellan.common;
-
-import java.util.Map;
+package com.jjdevbros.castellan.common.model;
 
 import lombok.Builder;
 import lombok.Data;
@@ -29,9 +27,9 @@ public class EventModel implements Comparable {
     private String userName;
 
     /**
-     * Some other information about the event
+     * Name of the host
      */
-    private Map<String, Object> rawData;
+    private String hostName;
 
     @Override
     public int compareTo(Object o) {

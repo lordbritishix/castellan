@@ -1,8 +1,8 @@
 package com.jjdevbros.castellan.reportgenerator.generator;
 
-import com.jjdevbros.castellan.common.EventModel;
-import com.jjdevbros.castellan.common.NormalizedSession;
-import com.jjdevbros.castellan.common.SessionPeriod;
+import com.jjdevbros.castellan.common.model.EventModel;
+import com.jjdevbros.castellan.common.model.NormalizedSession;
+import com.jjdevbros.castellan.common.model.SessionPeriod;
 import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
 import com.jjdevbros.castellan.reportgenerator.session.Sessionizer;
 import org.apache.commons.lang3.tuple.Pair;

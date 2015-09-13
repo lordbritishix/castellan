@@ -1,5 +1,6 @@
-package com.jjdevbros.castellan.common;
+package com.jjdevbros.castellan.common.model;
 
+import com.jjdevbros.castellan.common.model.SessionPeriod;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -3,9 +3,9 @@ package com.jjdevbros.castellan.reportgenerator.report;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import com.jjdevbros.castellan.common.EventModel;
-import com.jjdevbros.castellan.common.InactivePeriod;
-import com.jjdevbros.castellan.common.SessionPeriod;
+import com.jjdevbros.castellan.common.model.EventModel;
+import com.jjdevbros.castellan.common.model.InactivePeriod;
+import com.jjdevbros.castellan.common.model.SessionPeriod;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,10 +1,10 @@
 package com.jjdevbros.castellan.reportgenerator.serializer;
 
 import com.google.common.collect.Lists;
-import com.jjdevbros.castellan.common.Constants;
-import com.jjdevbros.castellan.common.EventModel;
-import com.jjdevbros.castellan.common.InactivePeriod;
-import com.jjdevbros.castellan.common.SessionPeriod;
+import com.jjdevbros.castellan.common.model.Constants;
+import com.jjdevbros.castellan.common.model.EventModel;
+import com.jjdevbros.castellan.common.model.InactivePeriod;
+import com.jjdevbros.castellan.common.model.SessionPeriod;
 import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
 import com.jjdevbros.castellan.reportgenerator.report.UserReport;
 import com.jjdevbros.castellan.reportgenerator.session.SessionPeriodSpliterator;

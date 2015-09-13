@@ -7,13 +7,13 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
-import com.jjdevbros.castellan.common.Constants;
-import com.jjdevbros.castellan.common.EventModel;
-import com.jjdevbros.castellan.common.NormalizedEventId;
-import com.jjdevbros.castellan.common.NormalizedEventModel;
-import com.jjdevbros.castellan.common.NormalizedSession;
-import com.jjdevbros.castellan.common.SessionPeriod;
-import com.jjdevbros.castellan.common.WindowsLogEventId;
+import com.jjdevbros.castellan.common.model.Constants;
+import com.jjdevbros.castellan.common.model.EventModel;
+import com.jjdevbros.castellan.common.model.NormalizedEventId;
+import com.jjdevbros.castellan.common.model.NormalizedEventModel;
+import com.jjdevbros.castellan.common.model.NormalizedSession;
+import com.jjdevbros.castellan.common.model.SessionPeriod;
+import com.jjdevbros.castellan.common.model.WindowsLogEventId;
 
 import lombok.extern.slf4j.Slf4j;
 

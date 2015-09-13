@@ -7,12 +7,12 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.*;
 import com.google.common.collect.ImmutableList;
-import com.jjdevbros.castellan.common.EventModel;
-import com.jjdevbros.castellan.common.NormalizedEventId;
-import com.jjdevbros.castellan.common.NormalizedEventModel;
-import com.jjdevbros.castellan.common.NormalizedSession;
-import com.jjdevbros.castellan.common.SessionPeriod;
-import com.jjdevbros.castellan.common.WindowsLogEventId;
+import com.jjdevbros.castellan.common.model.EventModel;
+import com.jjdevbros.castellan.common.model.NormalizedEventId;
+import com.jjdevbros.castellan.common.model.NormalizedEventModel;
+import com.jjdevbros.castellan.common.model.NormalizedSession;
+import com.jjdevbros.castellan.common.model.SessionPeriod;
+import com.jjdevbros.castellan.common.model.WindowsLogEventId;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;

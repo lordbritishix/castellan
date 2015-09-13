@@ -10,12 +10,12 @@ import java.util.List;
 import org.junit.*;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.jjdevbros.castellan.common.EventModel;
-import com.jjdevbros.castellan.common.InactivePeriod;
-import com.jjdevbros.castellan.common.NormalizedEventId;
-import com.jjdevbros.castellan.common.NormalizedEventModel;
-import com.jjdevbros.castellan.common.NormalizedSession;
-import com.jjdevbros.castellan.common.SessionPeriod;
+import com.jjdevbros.castellan.common.model.EventModel;
+import com.jjdevbros.castellan.common.model.InactivePeriod;
+import com.jjdevbros.castellan.common.model.NormalizedEventId;
+import com.jjdevbros.castellan.common.model.NormalizedEventModel;
+import com.jjdevbros.castellan.common.model.NormalizedSession;
+import com.jjdevbros.castellan.common.model.SessionPeriod;
 import com.jjdevbros.castellan.reportgenerator.report.UserReport;
 
 import static org.hamcrest.Matchers.is;

@@ -1,9 +1,9 @@
 package com.jjdevbros.castellan.reportgenerator.generator;
 
 import com.google.common.collect.ImmutableList;
-import com.jjdevbros.castellan.common.EventModel;
-import com.jjdevbros.castellan.common.SessionPeriod;
-import com.jjdevbros.castellan.common.WindowsLogEventId;
+import com.jjdevbros.castellan.common.model.EventModel;
+import com.jjdevbros.castellan.common.model.SessionPeriod;
+import com.jjdevbros.castellan.common.model.WindowsLogEventId;
 import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
 import com.jjdevbros.castellan.reportgenerator.report.UserReport;
 import org.junit.Before;

@@ -1,4 +1,4 @@
-package com.jjdevbros.castellan.common;
+package com.jjdevbros.castellan.common.model;
 
 import org.apache.commons.lang3.tuple.Pair;
 

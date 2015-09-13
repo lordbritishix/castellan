@@ -1,6 +1,6 @@
 package com.jjdevbros.castellan.reportgenerator.report;
 
-import com.jjdevbros.castellan.common.SessionPeriod;
+import com.jjdevbros.castellan.common.model.SessionPeriod;
 import com.jjdevbros.castellan.reportgenerator.serializer.AttendanceReportSerializer;
 import lombok.Builder;
 import lombok.Data;

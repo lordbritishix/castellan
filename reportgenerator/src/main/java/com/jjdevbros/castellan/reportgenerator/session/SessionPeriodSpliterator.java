@@ -1,7 +1,7 @@
 package com.jjdevbros.castellan.reportgenerator.session;
 
 import com.google.common.collect.Lists;
-import com.jjdevbros.castellan.common.SessionPeriod;
+import com.jjdevbros.castellan.common.model.SessionPeriod;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
