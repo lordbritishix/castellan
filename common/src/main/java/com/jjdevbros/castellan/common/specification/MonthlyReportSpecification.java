@@ -5,6 +5,6 @@ package com.jjdevbros.castellan.common.specification;
  */
 public class MonthlyReportSpecification extends ReportSpecification {
     public MonthlyReportSpecification() {
-        super("birt-reports/attendance_monthly.rptdesign", "monthly_report");
+        super("attendance_monthly.rptdesign", "monthly_report");
     }
 }

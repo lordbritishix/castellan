@@ -1,3 +1,5 @@
+package com.jjdevbros.castellan.console;
+
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.name.Names;

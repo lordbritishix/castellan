@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  */
 public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport> {
     private static final SimpleDateFormat SF = new SimpleDateFormat("MM/dd/yy h:mm:ss a");
-    private static final SimpleDateFormat SF_INACTIVITY = new SimpleDateFormat("kk:mm:ss");
+    private static final SimpleDateFormat SF_INACTIVITY = new SimpleDateFormat("HH:mm:ss");
 
     public AttendanceReportSerializer() {
         SF.setTimeZone(TimeZone.getTimeZone("UTC"));

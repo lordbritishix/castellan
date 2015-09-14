@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -158,7 +159,7 @@ public class ExcelFileRendererTest {
     }
 
     @Test
-    public void testEmptyMonthly() throws IOException, BirtException {
+    public void testEmptyMonthly() throws IOException, BirtException, URISyntaxException {
         List<EventModel> events = Lists.newArrayList();
 
         // 9/1

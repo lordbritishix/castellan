@@ -1,3 +1,5 @@
+package com.jjdevbros.castellan.console;
+
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.google.inject.Guice;
@@ -42,7 +44,8 @@ public class App {
         private boolean help;
     }
 
-    public static void main(String[] args) throws ExecutionException, InterruptedException, IOException, BirtException {
+    public static void main(String[] args)
+            throws ExecutionException, InterruptedException, IOException, BirtException {
         ReportGeneratorParams params = new ReportGeneratorParams();
 
         new JCommander(params, args);

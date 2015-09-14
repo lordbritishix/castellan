@@ -81,6 +81,7 @@ public class ReportGenerator {
         Path tempFile = Files.createTempFile(
                             Paths.get(System.getProperty("user.home")),
                             specification.getFileNamePrefix() + "_", ".pdf");
+
         boolean ret = renderer.write(report, tempFile, specification);
 
         if (!ret) {

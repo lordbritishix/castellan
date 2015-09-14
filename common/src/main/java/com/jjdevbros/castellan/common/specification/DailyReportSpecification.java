@@ -5,6 +5,6 @@ package com.jjdevbros.castellan.common.specification;
  */
 public class DailyReportSpecification extends ReportSpecification {
     public DailyReportSpecification() {
-        super("birt-reports/attendance_daily.rptdesign", "daily_report");
+        super("attendance_daily.rptdesign", "daily_report");
     }
 }

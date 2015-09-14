@@ -7,6 +7,7 @@ import com.jjdevbros.castellan.common.model.EventModel;
 import com.jjdevbros.castellan.common.model.SessionPeriod;
 import com.jjdevbros.castellan.common.serializer.SearchHitToEventModelSerializer;
 import com.jjdevbros.castellan.common.utils.SessionPeriodIndexSpliterator;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -23,9 +24,11 @@ import java.util.stream.Collectors;
 /**
  * Created by lordbritishix on 12/09/15.
  */
+@Slf4j
 public class AttendanceReportElasticStore implements AttendanceReportStore {
-    //index name is nxlog-[YYYYmmdd]
     private static final String TYPE = "eventlog";
+    private static final int PAGE_SIZE = 100;
+    private static final int PAGE_TIMEOUT = 60000;
 
     private ElasticClient elasticClient;
 
@@ -46,8 +49,8 @@ public class AttendanceReportElasticStore implements AttendanceReportStore {
         SearchResponse response = elasticClient.getClient()
                                     .prepareSearch(validIndices)
                                     .setSearchType(SearchType.SCAN)
-                                    .setScroll(new TimeValue(60000))
-                                    .setSize(100)
+                                    .setScroll(new TimeValue(PAGE_SIZE))
+                                    .setSize(PAGE_SIZE)
                                     .setQuery(QueryBuilders.termsQuery(
                                             "EventID",
                                             "4648",
@@ -63,11 +66,14 @@ public class AttendanceReportElasticStore implements AttendanceReportStore {
         List<EventModel> events = Lists.newArrayList();
         final SearchHitToEventModelSerializer serializer = new SearchHitToEventModelSerializer();
 
+        log.info("Fetching records");
+
         while (true) {
             List<SearchHit> hits = Arrays.asList(response.getHits().getHits());
 
             events.addAll(hits.stream().map(hit -> {
                 try {
+                    log.trace(hit.getSourceAsString());
                     return serializer.serialize(hit);
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
@@ -75,12 +81,19 @@ public class AttendanceReportElasticStore implements AttendanceReportStore {
             }).collect(Collectors.toList()));
 
             response = elasticClient.getClient().prepareSearchScroll(
-                    response.getScrollId()).setScroll(new TimeValue(60000)).execute().actionGet();
+                    response.getScrollId()).setScroll(new TimeValue(PAGE_TIMEOUT)).execute().actionGet();
 
-            if (response.getHits().getHits().length <= 0) {
+            int hitsLength = response.getHits().getHits().length;
+
+            if (hitsLength <= 0) {
+                log.info("No more records found for this session");
                 break;
             }
+
+            log.info("Found records for this page: {}", hitsLength);
         }
+
+        log.info("Done fetching records");
 
         return  events;
     }

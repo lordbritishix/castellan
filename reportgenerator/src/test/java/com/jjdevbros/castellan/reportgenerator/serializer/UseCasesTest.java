@@ -150,6 +150,71 @@ public class UseCasesTest {
         assertThat(userReport.get("inactivePeriods").size(), is(0));
     }
 
+    @Test
+    public void testMidnight1() throws IOException {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-02T11:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SHUTDOWN, "2015-09-02T23:59:59.00Z", "Jim")
+        );
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
+
+        JsonNode report = generateAttendanceReport(events, period);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
+
+        assertThat(userReport.get("userName").asText(), is("Jim"));
+        assertThat(userReport.get("startTime").asText(), is("09/02/15 11:00:00 AM"));
+        assertThat(userReport.get("endTime").asText(), is("09/02/15 11:59:59 PM"));
+        assertThat(userReport.get("inactivityDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("activityDuration").asText(), is("12:59:59"));
+        assertThat(userReport.get("workDuration").asText(), is("12:59:59"));
+        assertThat(userReport.get("inactivePeriods").size(), is(0));
+    }
+
+    @Test
+    public void testMidnight2() throws IOException {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-02T11:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SHUTDOWN, "2015-09-03T00:00:00.00Z", "Jim")
+        );
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
+
+        JsonNode report = generateAttendanceReport(events, period);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
+
+        assertThat(userReport.get("userName").asText(), is("Jim"));
+        assertThat(userReport.get("startTime").asText(), is("09/02/15 11:00:00 AM"));
+        assertThat(userReport.get("endTime").asText(), is(""));
+        assertThat(userReport.get("inactivityDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("activityDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("workDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("inactivePeriods").size(), is(0));
+        assertThat(userReport.get("hasErrors").asBoolean(), is(true));
+    }
+
+    @Test
+    public void testWholeDay() throws IOException {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-02T00:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREENSAVER_ACTIVE, "2015-09-02T12:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREENSAVER_INACTIVE, "2015-09-02T13:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SHUTDOWN, "2015-09-02T23:59:59.00Z", "Jim")
+        );
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
+
+        JsonNode report = generateAttendanceReport(events, period);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
+
+        assertThat(userReport.get("userName").asText(), is("Jim"));
+        assertThat(userReport.get("startTime").asText(), is("09/02/15 12:00:00 AM"));
+        assertThat(userReport.get("endTime").asText(), is("09/02/15 11:59:59 PM"));
+        assertThat(userReport.get("inactivityDuration").asText(), is("1:00:00"));
+        assertThat(userReport.get("activityDuration").asText(), is("22:59:59"));
+        assertThat(userReport.get("workDuration").asText(), is("23:59:59"));
+        assertThat(userReport.get("inactivePeriods").size(), is(1));
+    }
 
     @Test
     public void testLogOnLogOffWithMultipleLoginDifferentTime() throws IOException {

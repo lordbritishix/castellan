@@ -15,8 +15,6 @@ import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,6 +24,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Created by lordbritishix on 06/09/15.
@@ -46,12 +45,12 @@ public class ExcelFileRenderer {
 
         log.info("Generating report: " + outputPath.toString());
         ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource(specification.getReportTemplateName()).getFile());
+
         List<?> errors = Lists.newArrayList();
 
         byte[] data = null;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-             InputStream in = new FileInputStream(file)) {
+             InputStream is = ClassLoader.getSystemResourceAsStream(specification.getReportTemplateName())) {
 
             JsonFileRenderer jsonFileRenderer = new JsonFileRenderer();
             Path jsonOutput = Files.createTempFile(specification.getFileNamePrefix() + "_", ".json");
@@ -60,12 +59,14 @@ public class ExcelFileRenderer {
             log.info("Reading data source from: " + jsonOutput);
 
             EngineConfig config = new EngineConfig();
-            Platform.startup();
+            config.setLogConfig(System.getProperty("user.home"), Level.ALL);
+            config.setLogFile("birt.log");
+
+            Platform.startup(config);
             IReportEngineFactory factory = (IReportEngineFactory) Platform.createFactoryObject(
                     IReportEngineFactory.EXTENSION_REPORT_ENGINE_FACTORY);
             IReportEngine engine = factory.createReportEngine(config);
-
-            IReportRunnable design = engine.openReportDesign(in);
+            IReportRunnable design = engine.openReportDesign(is);
             IRunAndRenderTask runAndRenderTask = engine.createRunAndRenderTask(design);
             runAndRenderTask.setParameterValue("dataSource", jsonOutput.toString());
 
