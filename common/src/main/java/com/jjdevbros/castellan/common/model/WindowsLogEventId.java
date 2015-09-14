@@ -25,7 +25,10 @@ public enum WindowsLogEventId {
     NETWORK_DISCONNECTED(Pair.of("NetworkDisconnected", 10001)),
 
     //User gets connected from the network
-    NETWORK_CONNECTED(Pair.of("NetworkConnected", 100000));
+    NETWORK_CONNECTED(Pair.of("NetworkConnected", 100000)),
+
+    //User shuts down the machine
+    SHUTDOWN(Pair.of("Shutdown", 1074));
 
     private final Pair<String, Integer> tuple;
 

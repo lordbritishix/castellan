@@ -8,6 +8,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TimeZone;
 
 /**
@@ -31,7 +32,7 @@ public class SearchHitToEventModelSerializer {
         return EventModel.builder()
                 .hostName(hit.get("Hostname").toString())
                 .eventId(WindowsLogEventId.fromEventId(Integer.parseInt(hit.get("EventID").toString())))
-                .userName(hit.get("TargetUserName").toString())
+                .userName(Optional.ofNullable(hit.get("TargetUserName")).orElse(hit.get("UserID")).toString())
                 .timestamp(
                         DF.parse(hit.get("EventTime").toString()).toInstant().toEpochMilli())
                 .build();
@@ -48,7 +49,7 @@ public class SearchHitToEventModelSerializer {
 
         return hit.containsKey("Hostname")
             && hit.containsKey("EventID")
-            && hit.containsKey("TargetUserName")
+            && (hit.containsKey("TargetUserName") || (hit.containsKey("UserID")))
             && hit.containsKey("EventTime");
     }
 }

@@ -16,6 +16,7 @@ public final class Constants {
             WindowsLogEventId.SCREENSAVER_ACTIVE,
             WindowsLogEventId.SCREENSAVER_INACTIVE,
             WindowsLogEventId.SCREEN_LOCK,
+            WindowsLogEventId.SHUTDOWN,
             WindowsLogEventId.SCREEN_UNLOCK);
 
     public static final String EN_DASH = "–";

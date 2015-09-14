@@ -15,6 +15,8 @@ import org.eclipse.birt.core.exception.BirtException;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -73,14 +75,21 @@ public class ReportGenerator {
 
         log.info("Generating report for the period: " + sessionPeriod.toString());
 
-
-
         AttendanceReport report = generator.generateAttendanceReport(
-                reportStore.getEvents(sessionPeriod.getStartTime().toLocalDate()), sessionPeriod);
+                reportStore.getEvents(sessionPeriod), sessionPeriod);
 
-        renderer.write(report, Files.createTempFile("monthly_", ".pdf"), specification);
+        Path tempFile = Files.createTempFile(
+                            Paths.get(System.getProperty("user.home")),
+                            specification.getFileNamePrefix() + "_", ".pdf");
+        boolean ret = renderer.write(report, tempFile, specification);
 
-        log.info("Report generated! Elapsed time: {} ms", Duration.between(now, Instant.now()).toMillis());
+        if (!ret) {
+            Files.delete(tempFile);
+            log.info("Nothing to generate! Elapsed time: {} ms", Duration.between(now, Instant.now()).toMillis());
+        }
+        else {
+            log.info("Report generated! Elapsed time: {} ms", Duration.between(now, Instant.now()).toMillis());
+        }
     }
 
 }

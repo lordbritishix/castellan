@@ -149,6 +149,7 @@ public class Sessionizer {
         switch(eventModel.getEventId()) {
             case SCREEN_LOCK:
             case SCREENSAVER_ACTIVE:
+            case SHUTDOWN:
             case LOG_OUT:
                 builder.eventId(NormalizedEventId.INACTIVE);
                 break;

@@ -474,7 +474,7 @@ ctr = 0;]]></method>
                             <data id="319">
                                 <structure name="dateTimeFormat">
                                     <property name="category">Custom</property>
-                                    <property name="pattern">kk:mm:ss</property>
+                                    <property name="pattern">HH:mm:ss</property>
                                 </structure>
                                 <list-property name="mapRules">
                                     <structure>
@@ -537,7 +537,7 @@ ctr = 0;]]></method>
                             <data id="320">
                                 <structure name="dateTimeFormat">
                                     <property name="category">Custom</property>
-                                    <property name="pattern">kk:mm:ss</property>
+                                    <property name="pattern">HH:mm:ss</property>
                                 </structure>
                                 <list-property name="mapRules">
                                     <structure>
