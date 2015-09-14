@@ -24,6 +24,7 @@
         <guice.version>1.0</guice.version>
         <elasticsearch.version>1.7.1</elasticsearch.version>
         <guice.version>1.0</guice.version>
+        <jackson-mapper-asl.version>1.9.13</jackson-mapper-asl.version>
     </properties>
 
     <modules>
@@ -44,7 +45,7 @@
             <dependency>
                 <groupId>org.codehaus.jackson</groupId>
                 <artifactId>jackson-mapper-asl</artifactId>
-                <version>1.9.13</version>
+                <version>${jackson-mapper-asl.version}</version>
             </dependency>
 
             <dependency>

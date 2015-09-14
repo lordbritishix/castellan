@@ -1,13 +1,5 @@
 package com.jjdevbros.castellan.reportgenerator.generator;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import org.junit.*;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.jjdevbros.castellan.common.model.EventModel;
@@ -17,10 +9,22 @@ import com.jjdevbros.castellan.common.model.NormalizedEventModel;
 import com.jjdevbros.castellan.common.model.NormalizedSession;
 import com.jjdevbros.castellan.common.model.SessionPeriod;
 import com.jjdevbros.castellan.reportgenerator.report.UserReport;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by lordbritishix on 05/09/15.
@@ -65,7 +69,7 @@ public class UserReportGeneratorTest {
         events.add(buildTestEvent(Instant.parse("2015-09-02T10:15:30.00Z").toEpochMilli(), NormalizedEventId.ACTIVE));
 
         assertThat(fixture.computeStartTime(NormalizedSession.builder().events(events).build()).get(),
-                    is(Instant.parse("2015-09-02T08:15:30.00Z")));
+                is(Instant.parse("2015-09-02T08:15:30.00Z")));
     }
 
     @Test
@@ -149,6 +153,26 @@ public class UserReportGeneratorTest {
     }
 
     @Test
+    public void testGetActivityPeriodsComputesFromFirstActivePeriod() {
+        List<NormalizedEventModel> events = Lists.newArrayList();
+        events.add(buildTestEvent(Instant.parse("2015-09-02T00:15:30.00Z").toEpochMilli(), NormalizedEventId.INACTIVE));
+        events.add(buildTestEvent(Instant.parse("2015-09-02T01:15:30.00Z").toEpochMilli(), NormalizedEventId.INACTIVE));
+        events.add(buildTestEvent(Instant.parse("2015-09-02T08:15:30.00Z").toEpochMilli(), NormalizedEventId.ACTIVE));
+        events.add(buildTestEvent(Instant.parse("2015-09-02T10:15:30.00Z").toEpochMilli(), NormalizedEventId.INACTIVE));
+        events.add(buildTestEvent(Instant.parse("2015-09-02T12:15:30.00Z").toEpochMilli(), NormalizedEventId.ACTIVE));
+        events.add(buildTestEvent(Instant.parse("2015-09-02T14:15:30.00Z").toEpochMilli(), NormalizedEventId.INACTIVE));
+
+        List<InactivePeriod> inactivePeriods =
+                fixture.getInactivityActivityPeriods(NormalizedSession.builder().events(events).build());
+
+        List<InactivePeriod> expectedInactivePeriods = ImmutableList.of(
+                new InactivePeriod(LocalDateTime.ofInstant(Instant.parse("2015-09-02T10:15:30.00Z"), ZoneOffset.UTC),
+                        LocalDateTime.ofInstant(Instant.parse("2015-09-02T12:15:30.00Z"), ZoneOffset.UTC)));
+
+        assertTrue(inactivePeriods.equals(expectedInactivePeriods));
+    }
+
+    @Test
     public void testGetActivityPeriodsReturnsCorrectPeriodsForDuplicateCase() {
         List<NormalizedEventModel> events = Lists.newArrayList();
         events.add(buildTestEvent(Instant.parse("2015-09-02T08:15:30.00Z").toEpochMilli(), NormalizedEventId.ACTIVE));
@@ -171,7 +195,7 @@ public class UserReportGeneratorTest {
                         LocalDateTime.ofInstant(Instant.parse("2015-09-02T12:15:30.00Z"), ZoneOffset.UTC)),
                 new InactivePeriod(LocalDateTime.ofInstant(Instant.parse("2015-09-02T14:15:30.00Z"), ZoneOffset.UTC),
                         LocalDateTime.ofInstant(Instant.parse("2015-09-02T16:30:30.00Z"), ZoneOffset.UTC))
-                );
+        );
 
         assertTrue(inactivePeriods.equals(expectedInactivePeriods));
     }
@@ -219,7 +243,7 @@ public class UserReportGeneratorTest {
         List<InactivePeriod> inactivePeriods =
                 fixture.getInactivityActivityPeriods(NormalizedSession.builder().events(events).build());
 
-        assertThat(inactivePeriods.size(), is(1));
+        assertThat(inactivePeriods.size(), is(0));
     }
 
 
@@ -369,7 +393,6 @@ public class UserReportGeneratorTest {
         assertThat(report.getInactivityDuration(), is(Duration.ofHours(0L)));
         assertThat(report.getActivityDuration(), is(Duration.ofHours(0L)));
     }
-
 
     private NormalizedEventModel buildTestEvent(long timeStamp, NormalizedEventId id) {
         return NormalizedEventModel.builder()

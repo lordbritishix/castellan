@@ -1,7 +1,9 @@
-package com.jjdevbros.castellan.common.model;
+package com.jjdevbros.castellan.common.utils;
 
 import com.google.common.collect.ImmutableList;
+import com.jjdevbros.castellan.common.model.WindowsLogEventId;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -17,4 +19,6 @@ public final class Constants {
             WindowsLogEventId.SCREEN_UNLOCK);
 
     public static final String EN_DASH = "–";
+    public static final String INDEX_PREFIX = "nxlog-";
+    public static final SimpleDateFormat INDEX_FORMATTER = new SimpleDateFormat("YYYYMMdd");
 }

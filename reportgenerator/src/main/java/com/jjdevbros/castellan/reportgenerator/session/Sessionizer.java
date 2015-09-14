@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
-import com.jjdevbros.castellan.common.model.Constants;
+import com.jjdevbros.castellan.common.utils.Constants;
 import com.jjdevbros.castellan.common.model.EventModel;
 import com.jjdevbros.castellan.common.model.NormalizedEventId;
 import com.jjdevbros.castellan.common.model.NormalizedEventModel;

@@ -132,7 +132,17 @@ public class UserReportGenerator {
 
         List<InactivePeriod> inactivePeriods = Lists.newArrayList();
         Stack<NormalizedEventModel> stack = new Stack<>();
+        boolean firstActiveFound = false;
+
         for (NormalizedEventModel event : events.getEvents()) {
+            if (event.getEventId() == NormalizedEventId.ACTIVE) {
+                firstActiveFound = true;
+            }
+
+            if (!firstActiveFound) {
+                continue;
+            }
+
             if ((event.getEventId() == NormalizedEventId.INACTIVE)  && stack.isEmpty()) {
                 stack.push(event);
             }

@@ -32,6 +32,25 @@ public class AttendanceReportGeneratorTest {
     }
 
     @Test
+    public void testInactiveActiveInactive() {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-13T12:11:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-13T18:02:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-13T18:08:00.00Z", "Jim")
+        );
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 13), LocalDate.of(2015, 9, 13));
+
+        AttendanceReport attendanceReport = fixture.generateAttendanceReport(events, period);
+        List<UserReport> userReports =
+                getUserReportsForSingleDay(attendanceReport.getUserReports(), LocalDate.of(2015, 9, 13));
+
+        assertThat(userReports.get(0).getInactivityDuration(), is(Duration.ofHours(0L)));
+        assertThat(userReports.get(0).getWorkDuration(),
+            is(Duration.between(Instant.parse("2015-09-13T18:02:00.00Z"), Instant.parse("2015-09-13T18:08:00.00Z"))));
+    }
+
+    @Test
     public void generateAttendanceReportForOneMonth() {
         List<EventModel> events = ImmutableList.of(
                 buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-02T08:15:30.00Z", "Jim"),

@@ -6,7 +6,9 @@ import com.jjdevbros.castellan.common.model.SessionType;
 import com.jjdevbros.castellan.reportgenerator.ReportGenerator;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.birt.core.exception.BirtException;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -40,7 +42,7 @@ public class App {
         private boolean help;
     }
 
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
+    public static void main(String[] args) throws ExecutionException, InterruptedException, IOException, BirtException {
         ReportGeneratorParams params = new ReportGeneratorParams();
 
         new JCommander(params, args);
