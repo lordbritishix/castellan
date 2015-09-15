@@ -9,13 +9,19 @@ import com.jjdevbros.castellan.reportgenerator.ReportGenerator;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.birt.core.exception.BirtException;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
 
 /**
  * Created by lordbritishix on 12/09/15.
@@ -47,6 +53,10 @@ public class App {
     public static void main(String[] args)
             throws ExecutionException, InterruptedException, IOException, BirtException {
         ReportGeneratorParams params = new ReportGeneratorParams();
+        LogManager.getLogManager().reset();
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+        Logger.getLogger("global").setLevel(Level.FINEST);
 
         new JCommander(params, args);
 
@@ -68,15 +78,16 @@ public class App {
                 params.getReportDate()).map(d -> LocalDate.parse(d)).orElse(LocalDate.now());
 
         Instant now = Instant.now();
+        Path path = null;
         if (params.getReportType().equals("daily")) {
             System.out.println("Generating report...");
-            generator.generateReport(dateParam, SessionType.DAILY);
+            path = generator.generateReport(dateParam, SessionType.DAILY);
             System.out.println("Report generated! Elapsed time: "
                     + Duration.between(now, Instant.now()).toMillis() + " ms");
         }
         else if (params.getReportType().equals("monthly")) {
             System.out.println("Generating report...");
-            generator.generateReport(dateParam, SessionType.MONTHLY);
+            path = generator.generateReport(dateParam, SessionType.MONTHLY);
             System.out.println("Report generated! Elapsed time: "
                     + Duration.between(now, Instant.now()).toMillis() + " ms");
         }
@@ -84,6 +95,9 @@ public class App {
             log.error("Invalid report type provided. Provide as daily or monthly.");
         }
 
+        if (path != null) {
+            System.out.println("Report is at: " + path.toString());
+        }
     }
 
 }

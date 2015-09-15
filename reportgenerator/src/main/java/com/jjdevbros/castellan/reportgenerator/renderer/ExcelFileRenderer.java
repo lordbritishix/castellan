@@ -24,7 +24,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.logging.Level;
 
 /**
  * Created by lordbritishix on 06/09/15.
@@ -44,8 +43,6 @@ public class ExcelFileRenderer {
         }
 
         log.info("Generating report: " + outputPath.toString());
-        ClassLoader classLoader = getClass().getClassLoader();
-
         List<?> errors = Lists.newArrayList();
 
         byte[] data = null;
@@ -59,9 +56,6 @@ public class ExcelFileRenderer {
             log.info("Reading data source from: " + jsonOutput);
 
             EngineConfig config = new EngineConfig();
-            config.setLogConfig(System.getProperty("user.home"), Level.ALL);
-            config.setLogFile("birt.log");
-
             Platform.startup(config);
             IReportEngineFactory factory = (IReportEngineFactory) Platform.createFactoryObject(
                     IReportEngineFactory.EXTENSION_REPORT_ENGINE_FACTORY);

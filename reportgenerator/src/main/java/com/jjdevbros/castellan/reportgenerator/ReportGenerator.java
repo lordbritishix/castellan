@@ -20,6 +20,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -36,52 +37,49 @@ public class ReportGenerator {
         this.renderer = renderer;
     }
 
-    public boolean generateReport(LocalDate period, SessionType sessionType)
+    public Path generateReport(LocalDate period, SessionType sessionType)
             throws ExecutionException, InterruptedException, IOException, BirtException {
 
         switch(sessionType) {
             case DAILY:
-                generateDailyReport(period);
-                break;
+                return generateDailyReport(period);
 
             case MONTHLY:
-                generateMonthlyReport(period);
-                break;
+                return generateMonthlyReport(period);
         }
 
-        return true;
+        return null;
     }
 
-    private void generateMonthlyReport(LocalDate period)
+    private Path generateMonthlyReport(LocalDate period)
             throws ExecutionException, InterruptedException, IOException, BirtException {
         LocalDate start = LocalDate.of(period.getYear(), period.getMonthValue(), 1);
         LocalDate end = start.plusMonths(1L).minusDays(1L);
         SessionPeriod sessionPeriod = new SessionPeriod(start, end);
 
-        generateReport(sessionPeriod, new MonthlyReportSpecification());
+        return generateReport(sessionPeriod, new MonthlyReportSpecification());
     }
 
-    private void generateDailyReport(LocalDate period)
+    private Path generateDailyReport(LocalDate period)
             throws ExecutionException, InterruptedException, IOException, BirtException {
         SessionPeriod sessionPeriod = new SessionPeriod(period, period);
 
-        generateReport(sessionPeriod, new DailyReportSpecification());
+        return generateReport(sessionPeriod, new DailyReportSpecification());
     }
 
-    private void generateReport(SessionPeriod sessionPeriod, ReportSpecification specification)
+    private Path generateReport(SessionPeriod sessionPeriod, ReportSpecification specification)
             throws ExecutionException, InterruptedException, IOException, BirtException {
         Instant now = Instant.now();
         AttendanceReportGenerator generator = new AttendanceReportGenerator();
 
-        log.info("Generating report for the period: " + sessionPeriod.toString());
-
         AttendanceReport report = generator.generateAttendanceReport(
                 reportStore.getEvents(sessionPeriod), sessionPeriod);
 
-        Path tempFile = Files.createTempFile(
-                            Paths.get(System.getProperty("user.home")),
-                            specification.getFileNamePrefix() + "_", ".pdf");
+        log.info("Generating report type: {} for report id: {} for the period: {}",
+                specification.getFileNamePrefix(), report.getReportId().toString(), sessionPeriod.toString());
 
+        String name = String.format("%s_%s.pdf", specification.getFileNamePrefix(), LocalDateTime.now().toString());
+        Path tempFile = Files.createFile(Paths.get(System.getProperty("user.home") + "/" + name));
         boolean ret = renderer.write(report, tempFile, specification);
 
         if (!ret) {
@@ -91,6 +89,8 @@ public class ReportGenerator {
         else {
             log.info("Report generated! Elapsed time: {} ms", Duration.between(now, Instant.now()).toMillis());
         }
+
+        return tempFile;
     }
 
 }
