@@ -1,0 +1,16 @@
+{
+  "elastic.hostname": "52.1.142.197",
+  "elastic.port": 9300,
+  "elastic.clustername": "elasticsearch",
+  "groups": {
+    "Halifax": [
+      "Jim",
+      "Jen",
+      "IEUser"
+    ],
+    "Calgary": [
+      "Jeff",
+      "Jacob"
+    ]
+  }
+}

@@ -1,21 +1,21 @@
 package com.jjdevbros.castellan.reportgenerator.session;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import java.util.stream.Collectors;
-import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
-import com.jjdevbros.castellan.common.utils.Constants;
 import com.jjdevbros.castellan.common.model.EventModel;
 import com.jjdevbros.castellan.common.model.NormalizedEventId;
 import com.jjdevbros.castellan.common.model.NormalizedEventModel;
 import com.jjdevbros.castellan.common.model.NormalizedSession;
 import com.jjdevbros.castellan.common.model.SessionPeriod;
 import com.jjdevbros.castellan.common.model.WindowsLogEventId;
-
+import com.jjdevbros.castellan.common.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class Sessionizer {

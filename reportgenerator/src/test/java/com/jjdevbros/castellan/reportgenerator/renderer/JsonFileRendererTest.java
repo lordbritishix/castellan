@@ -1,27 +1,31 @@
 package com.jjdevbros.castellan.reportgenerator.renderer;
 
+import com.google.common.collect.ImmutableList;
+import com.jjdevbros.castellan.common.database.JsonGroupLookup;
+import com.jjdevbros.castellan.common.model.EventModel;
+import com.jjdevbros.castellan.common.model.SessionPeriod;
+import com.jjdevbros.castellan.common.model.WindowsLogEventId;
+import com.jjdevbros.castellan.reportgenerator.generator.AttendanceReportGenerator;
+import com.jjdevbros.castellan.reportgenerator.generator.UserReportGenerator;
+import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.*;
-import com.google.common.collect.ImmutableList;
-import com.jjdevbros.castellan.common.model.EventModel;
-import com.jjdevbros.castellan.common.model.SessionPeriod;
-import com.jjdevbros.castellan.common.model.WindowsLogEventId;
-import com.jjdevbros.castellan.reportgenerator.generator.AttendanceReportGenerator;
-import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 public class JsonFileRendererTest {
     private JsonFileRenderer fixture;
-    private AttendanceReportGenerator generator = new AttendanceReportGenerator();
+    private AttendanceReportGenerator generator = new AttendanceReportGenerator(new UserReportGenerator(new JsonGroupLookup(null)));
 
     @Before
     public void setup() {

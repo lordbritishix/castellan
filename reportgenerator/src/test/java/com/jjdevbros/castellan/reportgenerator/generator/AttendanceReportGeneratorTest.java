@@ -1,6 +1,7 @@
 package com.jjdevbros.castellan.reportgenerator.generator;
 
 import com.google.common.collect.ImmutableList;
+import com.jjdevbros.castellan.common.database.JsonGroupLookup;
 import com.jjdevbros.castellan.common.model.EventModel;
 import com.jjdevbros.castellan.common.model.SessionPeriod;
 import com.jjdevbros.castellan.common.model.WindowsLogEventId;
@@ -28,7 +29,7 @@ public class AttendanceReportGeneratorTest {
 
     @Before
     public void setup() {
-        fixture = new AttendanceReportGenerator();
+        fixture = new AttendanceReportGenerator(new UserReportGenerator(new JsonGroupLookup(null)));
     }
 
     @Test

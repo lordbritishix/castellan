@@ -2,13 +2,17 @@ package com.jjdevbros.castellan.reportgenerator.renderer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.jjdevbros.castellan.common.database.JsonGroupLookup;
 import com.jjdevbros.castellan.common.model.EventModel;
 import com.jjdevbros.castellan.common.model.SessionPeriod;
 import com.jjdevbros.castellan.common.model.WindowsLogEventId;
 import com.jjdevbros.castellan.common.specification.DailyReportSpecification;
 import com.jjdevbros.castellan.common.specification.MonthlyReportSpecification;
 import com.jjdevbros.castellan.reportgenerator.generator.AttendanceReportGenerator;
+import com.jjdevbros.castellan.reportgenerator.generator.UserReportGenerator;
 import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.eclipse.birt.core.exception.BirtException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -175,7 +179,22 @@ public class ExcelFileRendererTest {
     }
 
     private AttendanceReport createAttendanceReport(List<EventModel> events, SessionPeriod period) throws IOException {
-        AttendanceReportGenerator generator = new AttendanceReportGenerator();
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode lookup = mapper.readTree("{\n" +
+                "    \"Halifax\": [\n" +
+                "      \"Jim\",\n" +
+                "      \"Jen\",\n" +
+                "      \"IEUser\"\n" +
+                "    ],\n" +
+                "    \"Calgary\": [\n" +
+                "      \"Jeff\",\n" +
+                "      \"Jacob\",\n" +
+                "      \"IEUser\"\n" +
+                "    ]\n" +
+                "  }\n" +
+                "}");
+
+        AttendanceReportGenerator generator = new AttendanceReportGenerator(new UserReportGenerator(new JsonGroupLookup(lookup)));
         return generator.generateAttendanceReport(events, period);
     }
 

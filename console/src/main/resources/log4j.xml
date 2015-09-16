@@ -17,7 +17,7 @@
     </appender>
     <root>
         <level value="Debug"/>
-        <!--<appender-ref ref="Console"/>-->
+        <appender-ref ref="Console"/>
         <appender-ref ref="rotating_file"/>
     </root>
 </log4j:configuration>

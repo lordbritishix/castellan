@@ -1,10 +1,12 @@
 package com.jjdevbros.castellan.reportgenerator.serializer;
 
 import com.google.common.collect.ImmutableList;
+import com.jjdevbros.castellan.common.database.JsonGroupLookup;
 import com.jjdevbros.castellan.common.model.EventModel;
 import com.jjdevbros.castellan.common.model.SessionPeriod;
 import com.jjdevbros.castellan.common.model.WindowsLogEventId;
 import com.jjdevbros.castellan.reportgenerator.generator.AttendanceReportGenerator;
+import com.jjdevbros.castellan.reportgenerator.generator.UserReportGenerator;
 import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
 import lombok.extern.slf4j.Slf4j;
 import org.codehaus.jackson.JsonNode;
@@ -26,7 +28,7 @@ import static org.junit.Assert.assertThat;
  */
 @Slf4j
 public class UseCasesTest {
-    private AttendanceReportGenerator generator = new AttendanceReportGenerator();
+    private AttendanceReportGenerator generator = new AttendanceReportGenerator(new UserReportGenerator(new JsonGroupLookup(null)));
     private JsonWriter fixture;
 
     @Before

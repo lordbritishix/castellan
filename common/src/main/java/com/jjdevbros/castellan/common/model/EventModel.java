@@ -31,6 +31,11 @@ public class EventModel implements Comparable {
      */
     private String hostName;
 
+    /**
+     * Name of the group
+     */
+    private String group;
+
     @Override
     public int compareTo(Object o) {
         if (!(o instanceof  EventModel)) {

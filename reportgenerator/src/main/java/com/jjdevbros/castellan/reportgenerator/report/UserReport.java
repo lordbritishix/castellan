@@ -1,15 +1,15 @@
 package com.jjdevbros.castellan.reportgenerator.report;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.List;
 import com.jjdevbros.castellan.common.model.EventModel;
 import com.jjdevbros.castellan.common.model.InactivePeriod;
 import com.jjdevbros.castellan.common.model.SessionPeriod;
-
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
 
 /**
  * Created by lordbritishix on 05/09/15.
@@ -60,6 +60,11 @@ public class UserReport implements Comparable {
      * Description of the error
      */
     private String errorDescription;
+
+    /**
+     * Group where the user belongs
+     */
+    private String group;
 
     /**
      * List of inactive periods for this user

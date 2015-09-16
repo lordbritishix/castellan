@@ -1,10 +1,10 @@
 package com.jjdevbros.castellan.reportgenerator.serializer;
 
 import com.google.common.collect.Lists;
-import com.jjdevbros.castellan.common.utils.Constants;
 import com.jjdevbros.castellan.common.model.EventModel;
 import com.jjdevbros.castellan.common.model.InactivePeriod;
 import com.jjdevbros.castellan.common.model.SessionPeriod;
+import com.jjdevbros.castellan.common.utils.Constants;
 import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
 import com.jjdevbros.castellan.reportgenerator.report.UserReport;
 import com.jjdevbros.castellan.reportgenerator.session.SessionPeriodSpliterator;
@@ -104,6 +104,7 @@ public class AttendanceReportSerializer extends JsonSerializer<AttendanceReport>
         writeDuration("workDuration", userReport.getWorkDuration(), generator);
         generator.writeBooleanField("hasErrors", userReport.isHasErrors());
         generator.writeStringField("errorDescription", userReport.getErrorDescription());
+        generator.writeStringField("group", userReport.getGroup());
         generator.writeArrayFieldStart("inactivePeriods");
         for (InactivePeriod inactivePeriod : userReport.getInactivePeriods()) {
             writeInactivePeriod(inactivePeriod, generator);

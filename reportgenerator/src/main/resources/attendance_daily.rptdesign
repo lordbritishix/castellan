@@ -34,6 +34,11 @@
                     <property name="name">reportGeneratedAt</property>
                     <property name="dataType">date-time</property>
                 </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">sessionStart</property>
+                    <property name="dataType">date-time</property>
+                </structure>
             </list-property>
             <list-property name="columnHints">
                 <structure>
@@ -41,6 +46,9 @@
                 </structure>
                 <structure>
                     <property name="columnName">reportGeneratedAt</property>
+                </structure>
+                <structure>
+                    <property name="columnName">sessionStart</property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -53,6 +61,11 @@
                     <structure>
                         <property name="position">2</property>
                         <property name="name">reportGeneratedAt</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">sessionStart</property>
                         <property name="dataType">date-time</property>
                     </structure>
                 </list-property>
@@ -71,6 +84,7 @@ jsonData = mapper.readTree(input);]]></method>
             <method name="fetch"><![CDATA[if (ctr < 1) {
 	row.reportId = jsonData.get("reportId").asText();
 	row.reportGeneratedAt = jsonData.get("reportedGeneratedAt").asText();
+    row.sessionStart = jsonData.get("sessionStart").asText();
 	
 	ctr++;
 	
@@ -130,6 +144,11 @@ ctr = 0;]]></method>
                     <property name="name">error</property>
                     <property name="dataType">string</property>
                 </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">group</property>
+                    <property name="dataType">string</property>
+                </structure>
             </list-property>
             <list-property name="columnHints">
                 <structure>
@@ -158,6 +177,9 @@ ctr = 0;]]></method>
                 </structure>
                 <structure>
                     <property name="columnName">error</property>
+                </structure>
+                <structure>
+                    <property name="columnName">group</property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
@@ -207,6 +229,11 @@ ctr = 0;]]></method>
                         <property name="name">error</property>
                         <property name="dataType">string</property>
                     </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">group</property>
+                        <property name="dataType">string</property>
+                    </structure>
                 </list-property>
             </structure>
             <property name="dataSource">dailyAttendanceSource</property>
@@ -231,7 +258,7 @@ report = userReport.get("report");]]></method>
     row.end = reportData.get("endTime").asText();
     row.activityDuration = reportData.get("activityDuration").asText();
     row.workDuration = reportData.get("workDuration").asText();
-    
+    row.group = reportData.get("group").asText();
     size = reportData.path("inactivePeriods").size();
     
     row.inactivePeriods = "";
@@ -283,7 +310,7 @@ ctr = 0;]]></method>
                             </label>
                         </cell>
                         <cell id="114">
-                            <data id="318">
+                            <data id="321">
                                 <property name="fontSize">x-large</property>
                                 <structure name="dateTimeFormat">
                                     <property name="category">Long Date</property>
@@ -293,13 +320,13 @@ ctr = 0;]]></method>
                                 <property name="dataSet">AttendanceDataSet</property>
                                 <list-property name="boundDataColumns">
                                     <structure>
-                                        <property name="name">reportGeneratedAt</property>
-                                        <text-property name="displayName">reportGeneratedAt</text-property>
-                                        <expression name="expression" type="javascript">dataSetRow["reportGeneratedAt"]</expression>
+                                        <property name="name">sessionStart</property>
+                                        <text-property name="displayName">sessionStart</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["sessionStart"]</expression>
                                         <property name="dataType">date-time</property>
                                     </structure>
                                 </list-property>
-                                <property name="resultSetColumn">reportGeneratedAt</property>
+                                <property name="resultSetColumn">sessionStart</property>
                             </data>
                         </cell>
                     </row>
@@ -379,6 +406,19 @@ ctr = 0;]]></method>
                     <expression name="expression" type="javascript">dataSetRow["end"]</expression>
                     <property name="dataType">date-time</property>
                 </structure>
+                <structure>
+                    <property name="name">group</property>
+                    <text-property name="displayName">group</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["group"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <list-property name="sort">
+                <structure>
+                    <expression name="key" type="javascript">row["group"]</expression>
+                    <property name="direction">asc</property>
+                    <property name="strength">-1</property>
+                </structure>
             </list-property>
             <detail>
                 <grid id="256">
@@ -388,6 +428,7 @@ ctr = 0;]]></method>
                     <property name="borderTopStyle">none</property>
                     <property name="marginBottom">10pt</property>
                     <property name="width">7.854166666666667in</property>
+                    <structure name="toc"/>
                     <column id="257">
                         <property name="width">1.5104166666666667in</property>
                     </column>
@@ -435,6 +476,9 @@ ctr = 0;]]></method>
                             <property name="borderRightStyle">solid</property>
                             <property name="borderRightWidth">medium</property>
                             <property name="borderTopStyle">none</property>
+                            <data id="322">
+                                <property name="resultSetColumn">group</property>
+                            </data>
                         </cell>
                         <cell id="311">
                             <property name="borderRightStyle">solid</property>

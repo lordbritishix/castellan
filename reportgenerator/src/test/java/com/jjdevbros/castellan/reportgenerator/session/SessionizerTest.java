@@ -1,11 +1,5 @@
 package com.jjdevbros.castellan.reportgenerator.session;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.*;
 import com.google.common.collect.ImmutableList;
 import com.jjdevbros.castellan.common.model.EventModel;
 import com.jjdevbros.castellan.common.model.NormalizedEventId;
@@ -13,9 +7,20 @@ import com.jjdevbros.castellan.common.model.NormalizedEventModel;
 import com.jjdevbros.castellan.common.model.NormalizedSession;
 import com.jjdevbros.castellan.common.model.SessionPeriod;
 import com.jjdevbros.castellan.common.model.WindowsLogEventId;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class SessionizerTest {
     private Sessionizer fixture;

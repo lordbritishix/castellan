@@ -98,6 +98,9 @@ public class App {
         if (path != null) {
             System.out.println("Report is at: " + path.toString());
         }
+        else {
+            System.out.println("Nothing to generate!");
+        }
     }
 
 }

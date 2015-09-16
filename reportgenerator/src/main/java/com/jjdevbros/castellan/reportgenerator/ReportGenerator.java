@@ -28,13 +28,16 @@ import java.util.concurrent.ExecutionException;
  */
 @Slf4j
 public class ReportGenerator {
-    private AttendanceReportStore reportStore;
-    private ExcelFileRenderer renderer;
+    private final AttendanceReportStore reportStore;
+    private final ExcelFileRenderer renderer;
+    private final AttendanceReportGenerator generator;
 
     @Inject
-    public ReportGenerator(AttendanceReportStore reportStore, ExcelFileRenderer renderer) {
+    public ReportGenerator(AttendanceReportStore reportStore, ExcelFileRenderer renderer,
+                           AttendanceReportGenerator generator) {
         this.reportStore = reportStore;
         this.renderer = renderer;
+        this.generator = generator;
     }
 
     public Path generateReport(LocalDate period, SessionType sessionType)
@@ -70,8 +73,6 @@ public class ReportGenerator {
     private Path generateReport(SessionPeriod sessionPeriod, ReportSpecification specification)
             throws ExecutionException, InterruptedException, IOException, BirtException {
         Instant now = Instant.now();
-        AttendanceReportGenerator generator = new AttendanceReportGenerator();
-
         AttendanceReport report = generator.generateAttendanceReport(
                 reportStore.getEvents(sessionPeriod), sessionPeriod);
 
@@ -84,6 +85,7 @@ public class ReportGenerator {
 
         if (!ret) {
             Files.delete(tempFile);
+            tempFile = null;
             log.info("Nothing to generate! Elapsed time: {} ms", Duration.between(now, Instant.now()).toMillis());
         }
         else {

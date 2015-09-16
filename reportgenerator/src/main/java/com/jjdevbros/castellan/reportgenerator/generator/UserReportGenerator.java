@@ -1,5 +1,18 @@
 package com.jjdevbros.castellan.reportgenerator.generator;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+import com.jjdevbros.castellan.common.database.JsonGroupLookup;
+import com.jjdevbros.castellan.common.model.InactivePeriod;
+import com.jjdevbros.castellan.common.model.NormalizedEventId;
+import com.jjdevbros.castellan.common.model.NormalizedEventModel;
+import com.jjdevbros.castellan.common.model.NormalizedSession;
+import com.jjdevbros.castellan.common.model.SessionPeriod;
+import com.jjdevbros.castellan.reportgenerator.report.UserReport;
+import lombok.extern.slf4j.Slf4j;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -8,17 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.stream.Collectors;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.jjdevbros.castellan.common.model.InactivePeriod;
-import com.jjdevbros.castellan.common.model.NormalizedEventId;
-import com.jjdevbros.castellan.common.model.NormalizedEventModel;
-import com.jjdevbros.castellan.common.model.NormalizedSession;
-import com.jjdevbros.castellan.common.model.SessionPeriod;
-import com.jjdevbros.castellan.reportgenerator.report.UserReport;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created by lordbritishix on 05/09/15.
@@ -27,11 +29,20 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class UserReportGenerator {
+    private final JsonGroupLookup lookup;
+
+    @Inject
+    public UserReportGenerator(JsonGroupLookup lookup) {
+        this.lookup = lookup;
+    }
+
     public UserReport generateUserReport(String userName, NormalizedSession events, SessionPeriod period) {
         UserReport.UserReportBuilder builder = UserReport.builder()
                 .userName(userName)
+                .group(lookup.getGroupForName(userName))
                 .period(period)
                 .sourceEvents(events.getEvents().stream().map(e -> e.getEventModel()).collect(Collectors.toList()));
+
         List<String> errorDescriptions = Lists.newArrayList();
         Optional<Instant> startTime = computeStartTime(events);
         Optional<Instant> endTime = computeEndTime(events);

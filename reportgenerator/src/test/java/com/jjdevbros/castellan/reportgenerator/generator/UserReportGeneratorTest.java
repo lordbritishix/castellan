@@ -2,6 +2,7 @@ package com.jjdevbros.castellan.reportgenerator.generator;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.jjdevbros.castellan.common.database.JsonGroupLookup;
 import com.jjdevbros.castellan.common.model.EventModel;
 import com.jjdevbros.castellan.common.model.InactivePeriod;
 import com.jjdevbros.castellan.common.model.NormalizedEventId;
@@ -34,7 +35,7 @@ public class UserReportGeneratorTest {
 
     @Before
     public void setup() {
-        fixture = new UserReportGenerator();
+        fixture = new UserReportGenerator(new JsonGroupLookup(null));
     }
 
     @Test

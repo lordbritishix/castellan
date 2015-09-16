@@ -17,6 +17,8 @@ public class NormalizedSession {
 
     private String userName;
 
+    private String group;
+
     private boolean hasErrors;
 
     private String errorDescription;
