@@ -17,10 +17,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -79,7 +81,10 @@ public class ReportGenerator {
         log.info("Generating report type: {} for report id: {} for the period: {}",
                 specification.getFileNamePrefix(), report.getReportId().toString(), sessionPeriod.toString());
 
-        String name = String.format("%s_%s.pdf", specification.getFileNamePrefix(), LocalDateTime.now().toString());
+        DateFormat formatter = new SimpleDateFormat("yyyyMMdd_HHmmss");
+
+        String name = String.format("%s_%s.pdf", specification.getFileNamePrefix(),
+                            formatter.format(Date.from(Instant.now())));
         Path tempFile = Files.createFile(Paths.get(System.getProperty("user.home") + "/" + name));
         boolean ret = renderer.write(report, tempFile, specification);
 
