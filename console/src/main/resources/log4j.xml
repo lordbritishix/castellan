@@ -16,7 +16,7 @@
         </layout>
     </appender>
     <root>
-        <level value="Debug"/>
+        <level value="Info"/>
         <appender-ref ref="Console"/>
         <appender-ref ref="rotating_file"/>
     </root>

@@ -30,7 +30,11 @@ public class Sessionizer {
 
         List<SessionPeriod> splits = spliterator.splitDaily(sessionPeriod);
         return splits.stream()
-                .map(s -> Pair.of(s, getSessionizedEventsForPeriodWithoutSpillOver(events, s)))
+                .map(s -> Pair.of(s,
+                        getSessionizedEventsForPeriodWithoutSpillOver(
+                                events.stream()
+                                        .filter(e -> !e.getUserName().endsWith("$"))
+                                        .collect(Collectors.toList()), s)))
                 .collect(Collectors.toList());
     }
 

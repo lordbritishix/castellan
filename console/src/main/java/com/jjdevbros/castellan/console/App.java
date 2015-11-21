@@ -1,51 +1,66 @@
 package com.jjdevbros.castellan.console;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+import org.eclipse.birt.core.exception.BirtException;
+import org.slf4j.bridge.SLF4JBridgeHandler;
+import com.beust.jcommander.IDefaultProvider;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.jjdevbros.castellan.common.model.SessionType;
 import com.jjdevbros.castellan.reportgenerator.ReportGenerator;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.birt.core.exception.BirtException;
-import org.slf4j.bridge.SLF4JBridgeHandler;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
-
 
 /**
  * Created by lordbritishix on 12/09/15.
  */
 @Slf4j
 public class App {
-    private static class ReportGeneratorParams {
-        @Parameter(names = {"-t"},
-                description = "Type of report to generate. Provide as daily or monthly", required = true)
-        @Getter
-        private String reportType;
+    private static final IDefaultProvider DEFAULT_PROVIDER = s -> {
+        if (s.equals("-m")) {
+            return LocalDate.now().withDayOfMonth(1).minus(1L, ChronoUnit.MONTHS).toString();
+        }
+        else if (s.equals("-d")) {
+            return LocalDate.now().minus(1L, ChronoUnit.DAYS).toString();
+        }
 
+        return null;
+    };
+
+    @Parameters(commandDescription = "Generates a monthly report")
+    private static class CommandGenerateMonthlyReport {
+        @Parameter(names = "-m", description = "Month from which the report will be generated, in yyyy-MM-dd. "
+                + "If not provided, it will generate a report for the last month's data set")
+        private String from = "";
+    }
+
+    @Parameters(commandDescription = "Generates a daily report")
+    private static class CommandGenerateDailyReport {
+        @Parameter(names = "-d", description = "Day from which the report will be generated, in yyyy-MM-dd. "
+                + "If not provided, it will generate a report for yesterday's data set")
+        private String from = "";
+    }
+
+
+    private static class ReportGeneratorParams {
         @Parameter(names = {"-c"},
-                description = "Location of the config file.", required = true)
+                description = "Location of the config file", required = true)
         @Getter
         private String configFile;
 
-        @Parameter(names = {"-d"},
-                description = "Date of the reporting period. "
-                        + "Provide as yyyy-mm-dd. If ommitted, gets the day today")
-        @Getter
-        private String reportDate;
-
-        @Parameter(names = "--help", help = true)
+        @Parameter(names = "-help", description = "Prints the help text", help = true)
         @Getter
         private boolean help;
     }
@@ -56,43 +71,48 @@ public class App {
         LogManager.getLogManager().reset();
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
-        Logger.getLogger("global").setLevel(Level.FINEST);
+        Logger.getLogger("global").setLevel(Level.WARNING);
 
-        new JCommander(params, args);
+        JCommander jc = new JCommander(params);
+        jc.setDefaultProvider(DEFAULT_PROVIDER);
+        CommandGenerateMonthlyReport monthlyReport = new CommandGenerateMonthlyReport();
+        CommandGenerateDailyReport dailyReport = new CommandGenerateDailyReport();
+
+        jc.addCommand("monthly", monthlyReport);
+        jc.addCommand("daily", dailyReport);
+        jc.parse(args);
 
         if (params.isHelp()) {
-            System.out.println(
-                    "-t Type of report to generate. Provide as daily or monthly. Required.");
-            System.out.println(
-                    "-c Location of the config file. Required.");
-            System.out.println(
-                    "-d Date of the reporting period. Provide as yyyy-mm-dd. If ommitted, gets the day today");
+            jc.usage();
             return;
         }
 
         Injector injector = Guice.createInjector(new AttendanceReportModule(params.getConfigFile()));
-
         ReportGenerator generator = injector.getInstance(ReportGenerator.class);
 
-        LocalDate dateParam = Optional.ofNullable(
-                params.getReportDate()).map(d -> LocalDate.parse(d)).orElse(LocalDate.now());
-
         Instant now = Instant.now();
-        Path path = null;
-        if (params.getReportType().equals("daily")) {
-            System.out.println("Generating report...");
-            path = generator.generateReport(dateParam, SessionType.DAILY);
-            System.out.println("Report generated! Elapsed time: "
-                    + Duration.between(now, Instant.now()).toMillis() + " ms");
-        }
-        else if (params.getReportType().equals("monthly")) {
-            System.out.println("Generating report...");
+        Path path;
+
+        String p = jc.getParsedCommand();
+
+        if (p.equals("monthly")) {
+            LocalDate dateParam = LocalDate.parse(monthlyReport.from).withDayOfMonth(1);
+            System.out.println("Generating monthly report for reporting period: " + dateParam.toString());
             path = generator.generateReport(dateParam, SessionType.MONTHLY);
             System.out.println("Report generated! Elapsed time: "
                     + Duration.between(now, Instant.now()).toMillis() + " ms");
         }
+        else if (p.equals("daily")) {
+            LocalDate dateParam = LocalDate.parse(dailyReport.from);
+            System.out.println("Generating daily report for reporting period: " + dateParam.toString());
+            path = generator.generateReport(dateParam, SessionType.DAILY);
+            System.out.println("Report generated! Elapsed time: "
+                    + Duration.between(now, Instant.now()).toMillis() + " ms");
+        }
         else {
-            log.error("Invalid report type provided. Provide as daily or monthly.");
+            log.error("Invalid report type provided.");
+            jc.usage();
+            return;
         }
 
         if (path != null) {
@@ -102,5 +122,4 @@ public class App {
             System.out.println("Nothing to generate!");
         }
     }
-
 }

@@ -1,16 +1,18 @@
 package com.jjdevbros.castellan.console;
 
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Set;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import com.beust.jcommander.internal.Sets;
 import com.google.inject.Binder;
 import com.google.inject.Module;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import com.jjdevbros.castellan.common.database.AttendanceReportElasticStore;
 import com.jjdevbros.castellan.common.database.AttendanceReportStore;
 import lombok.extern.slf4j.Slf4j;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-
-import java.io.IOException;
-import java.nio.file.Paths;
 
 /**
  * Created by lordbritishix on 12/09/15.
@@ -32,24 +34,34 @@ public class AttendanceReportModule implements Module {
             log.error("Unable to read the config file");
             throw new RuntimeException(e);
         }
-
     }
 
     private void bindSettings(Binder binder) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode lookup = mapper.readTree(Paths.get(configFile).toFile());
-        binder.bind(String.class)
-                .annotatedWith(Names.named("elastic.hostname"))
-                .toInstance(lookup.get("elastic.hostname").asText());
-        binder.bind(Integer.class)
-                .annotatedWith(Names.named("elastic.port"))
-                .toInstance(lookup.get("elastic.port").asInt());
-        binder.bind(String.class)
-                .annotatedWith(Names.named("elastic.clustername"))
-                .toInstance(lookup.get("elastic.clustername").asText());
+
+        binder.bindConstant().annotatedWith(
+                Names.named("elastic.hostname")).to(lookup.get("elastic.hostname").asText());
+        binder.bindConstant().annotatedWith(
+                Names.named("elastic.port")).to(lookup.get("elastic.port").asInt());
+        binder.bindConstant().annotatedWith(
+                Names.named("elastic.clustername")).to(lookup.get("elastic.clustername").asText());
+        binder.bindConstant().annotatedWith(
+                Names.named("reporting.path")).to(lookup.get("reporting.path").asText());
+        binder.bindConstant().annotatedWith(
+                Names.named("inactive.threshold")).to(lookup.get("inactive.threshold").asLong());
         binder.bind(JsonNode.class)
-                .annotatedWith(Names.named("lookup.json"))
+                .annotatedWith(Names.named("lookup.list"))
                 .toInstance(lookup.get("groups"));
+
+        Set<String> excludeList = Sets.newHashSet();
+        lookup.get("exclude").forEach(p -> {
+            excludeList.add(p.asText());
+        });
+
+        binder.bind(new TypeLiteral<Set<String>>() { })
+                .annotatedWith(Names.named("exclude.list"))
+                .toInstance(excludeList);
 
     }
 }

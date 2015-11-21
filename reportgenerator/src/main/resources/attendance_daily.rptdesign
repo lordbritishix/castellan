@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 4.5.0.v201506092134 Build &lt;@BUILD@></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.1.v201408290142 Build &lt;4.4.1.v20140916-1320></property>
     <property name="units">in</property>
     <property name="iconFile">/templates/blank_report.gif</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -313,8 +313,8 @@ ctr = 0;]]></method>
                             <data id="321">
                                 <property name="fontSize">x-large</property>
                                 <structure name="dateTimeFormat">
-                                    <property name="category">Long Date</property>
-                                    <property name="pattern">Long Date</property>
+                                    <property name="category">Custom</property>
+                                    <property name="pattern">E MMMM d, y</property>
                                 </structure>
                                 <property name="textAlign">right</property>
                                 <property name="dataSet">AttendanceDataSet</property>
@@ -427,31 +427,36 @@ ctr = 0;]]></method>
                     <property name="borderRightStyle">none</property>
                     <property name="borderTopStyle">none</property>
                     <property name="marginBottom">10pt</property>
-                    <property name="width">7.854166666666667in</property>
+                    <property name="pageBreakAfter">avoid</property>
+                    <property name="pageBreakBefore">avoid</property>
+                    <property name="pageBreakInside">avoid</property>
+                    <property name="width">6.958333333333333in</property>
                     <structure name="toc"/>
                     <column id="257">
-                        <property name="width">1.5104166666666667in</property>
+                        <property name="width">1.2395833333333333in</property>
                     </column>
                     <column id="258">
-                        <property name="width">1.78125in</property>
+                        <property name="width">1.3541666666666667in</property>
                     </column>
                     <column id="297">
-                        <property name="width">3.5208333333333335in</property>
+                        <property name="width">2.9270833333333335in</property>
                     </column>
                     <column id="307">
-                        <property name="width">1.0416666666666667in</property>
+                        <property name="width">1.4375in</property>
                     </column>
                     <row id="259">
                         <cell id="260">
                             <property name="borderBottomStyle">solid</property>
-                            <property name="borderBottomWidth">medium</property>
+                            <property name="borderBottomWidth">thin</property>
                             <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderLeftWidth">thin</property>
                             <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">medium</property>
+                            <property name="borderRightWidth">thin</property>
                             <property name="borderTopStyle">solid</property>
-                            <property name="borderTopWidth">medium</property>
+                            <property name="borderTopWidth">thin</property>
                             <data id="274">
+                                <property name="fontSize">10pt</property>
+                                <property name="fontWeight">bold</property>
                                 <property name="borderBottomStyle">none</property>
                                 <property name="borderLeftStyle">none</property>
                                 <property name="borderRightStyle">none</property>
@@ -464,57 +469,77 @@ ctr = 0;]]></method>
                         <cell id="300"/>
                     </row>
                     <row id="309">
-                        <property name="borderLeftStyle">solid</property>
-                        <property name="borderLeftWidth">medium</property>
-                        <property name="borderRightStyle">solid</property>
-                        <property name="borderRightWidth">medium</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">medium</property>
                         <cell id="310">
-                            <property name="borderBottomStyle">none</property>
-                            <property name="borderLeftStyle">none</property>
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
                             <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">medium</property>
-                            <property name="borderTopStyle">none</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
                             <data id="322">
+                                <property name="fontWeight">bold</property>
                                 <property name="resultSetColumn">group</property>
                             </data>
                         </cell>
                         <cell id="311">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
                             <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">medium</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
                         </cell>
                         <cell id="312">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
                             <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">medium</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
                             <label id="314">
+                                <property name="fontWeight">bold</property>
                                 <text-property name="text">Inactive</text-property>
                             </label>
                         </cell>
                         <cell id="313">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
                             <label id="308">
+                                <property name="fontWeight">bold</property>
                                 <text-property name="text">Total</text-property>
                             </label>
                         </cell>
                     </row>
                     <row id="262">
-                        <property name="borderLeftStyle">solid</property>
-                        <property name="borderLeftWidth">medium</property>
-                        <property name="borderRightStyle">solid</property>
-                        <property name="borderRightWidth">medium</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">medium</property>
                         <cell id="263">
                             <property name="borderBottomStyle">none</property>
-                            <property name="borderLeftStyle">none</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
                             <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">medium</property>
+                            <property name="borderRightWidth">thin</property>
                             <property name="borderTopStyle">none</property>
                             <label id="272">
+                                <property name="fontWeight">bold</property>
                                 <text-property name="text">Start Time</text-property>
                             </label>
                         </cell>
                         <cell id="264">
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
                             <data id="319">
                                 <structure name="dateTimeFormat">
                                     <property name="category">Custom</property>
@@ -532,25 +557,27 @@ ctr = 0;]]></method>
                         </cell>
                         <cell id="291">
                             <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
                         </cell>
                         <cell id="301">
                             <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
                         </cell>
                     </row>
                     <row id="287">
-                        <property name="borderLeftStyle">solid</property>
-                        <property name="borderLeftWidth">medium</property>
-                        <property name="borderRightStyle">solid</property>
-                        <property name="borderRightWidth">medium</property>
                         <cell id="288">
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
                             <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">medium</property>
+                            <property name="borderRightWidth">thin</property>
                         </cell>
                         <cell id="289">
                             <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">medium</property>
+                            <property name="borderRightWidth">thin</property>
                         </cell>
                         <cell id="292">
                             <data id="299">
@@ -559,25 +586,30 @@ ctr = 0;]]></method>
                         </cell>
                         <cell id="302">
                             <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
                             <data id="316">
                                 <property name="resultSetColumn">inactivePeriodDurations</property>
                             </data>
                         </cell>
                     </row>
                     <row id="265">
-                        <property name="borderLeftStyle">solid</property>
-                        <property name="borderLeftWidth">medium</property>
-                        <property name="borderRightStyle">solid</property>
-                        <property name="borderRightWidth">medium</property>
                         <cell id="266">
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
                             <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">medium</property>
+                            <property name="borderRightWidth">thin</property>
                             <label id="273">
+                                <property name="fontWeight">bold</property>
                                 <text-property name="text">End Time</text-property>
                             </label>
                         </cell>
                         <cell id="267">
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
                             <data id="320">
                                 <structure name="dateTimeFormat">
                                     <property name="category">Custom</property>
@@ -595,28 +627,33 @@ ctr = 0;]]></method>
                         </cell>
                         <cell id="293">
                             <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
                         </cell>
                         <cell id="303">
                             <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
                         </cell>
                     </row>
                     <row id="281">
-                        <property name="borderBottomStyle">solid</property>
-                        <property name="borderBottomWidth">medium</property>
-                        <property name="borderLeftStyle">solid</property>
-                        <property name="borderLeftWidth">medium</property>
-                        <property name="borderRightStyle">solid</property>
-                        <property name="borderRightWidth">medium</property>
                         <cell id="282">
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
                             <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">medium</property>
+                            <property name="borderRightWidth">thin</property>
                             <label id="284">
+                                <property name="fontWeight">bold</property>
                                 <text-property name="text">Total time</text-property>
                             </label>
                         </cell>
                         <cell id="283">
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
                             <data id="286">
                                 <list-property name="mapRules">
                                     <structure>
@@ -630,31 +667,44 @@ ctr = 0;]]></method>
                         </cell>
                         <cell id="294">
                             <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
                         </cell>
                         <cell id="304">
                             <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
                             <data id="315">
                                 <property name="resultSetColumn">inactiveDuration</property>
                             </data>
                         </cell>
                     </row>
                     <row id="277">
-                        <property name="borderBottomStyle">solid</property>
-                        <property name="borderBottomWidth">medium</property>
-                        <property name="borderLeftStyle">solid</property>
-                        <property name="borderLeftWidth">medium</property>
-                        <property name="borderRightStyle">solid</property>
-                        <property name="borderRightWidth">medium</property>
                         <cell id="278">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
                             <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">medium</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
                             <label id="280">
+                                <property name="fontWeight">bold</property>
                                 <text-property name="text">Total working time</text-property>
                             </label>
                         </cell>
                         <cell id="279">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
                             <data id="285">
                                 <list-property name="mapRules">
                                     <structure>
@@ -667,12 +717,29 @@ ctr = 0;]]></method>
                             </data>
                         </cell>
                         <cell id="295">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
                             <data id="317">
                                 <property name="fontStyle">italic</property>
                                 <property name="resultSetColumn">error</property>
                             </data>
                         </cell>
-                        <cell id="305"/>
+                        <cell id="305">
+                            <property name="borderBottomStyle">solid</property>
+                            <property name="borderBottomWidth">thin</property>
+                            <property name="borderLeftStyle">solid</property>
+                            <property name="borderLeftWidth">thin</property>
+                            <property name="borderRightStyle">solid</property>
+                            <property name="borderRightWidth">thin</property>
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                        </cell>
                     </row>
                 </grid>
             </detail>

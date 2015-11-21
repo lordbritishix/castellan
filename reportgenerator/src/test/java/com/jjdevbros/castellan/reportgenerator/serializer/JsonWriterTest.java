@@ -1,6 +1,7 @@
 package com.jjdevbros.castellan.reportgenerator.serializer;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.jjdevbros.castellan.common.database.JsonGroupLookup;
 import com.jjdevbros.castellan.common.model.EventModel;
 import com.jjdevbros.castellan.common.model.SessionPeriod;
@@ -29,7 +30,8 @@ public class JsonWriterTest {
     private JsonGroupLookup lookup;
 
     private JsonWriter fixture;
-    private AttendanceReportGenerator generator = new AttendanceReportGenerator(new UserReportGenerator(new JsonGroupLookup(null)));
+    private AttendanceReportGenerator generator =
+            new AttendanceReportGenerator(new UserReportGenerator(new JsonGroupLookup(null), 0), ImmutableSet.of());
 
     @Before
     public void setup() {

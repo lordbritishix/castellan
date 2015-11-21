@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
-    <property name="createdBy">Eclipse BIRT Designer Version 4.5.0.v201506092134 Build &lt;@BUILD@></property>
+    <property name="createdBy">Eclipse BIRT Designer Version 4.4.1.v201408290142 Build &lt;4.4.1.v20140916-1320></property>
     <list-property name="userProperties">
         <structure>
             <property name="name">AttendanceMonthlyCube.UserReport.x</property>
@@ -403,13 +403,13 @@ return false;]]></method>
                             <property name="aggregationOnRow">group/userName</property>
                             <property name="aggregationOnColumn">session/session</property>
                             <property name="borderTopStyle">solid</property>
-                            <property name="borderTopWidth">medium</property>
+                            <property name="borderTopWidth">thin</property>
                             <property name="borderLeftStyle">solid</property>
-                            <property name="borderLeftWidth">medium</property>
+                            <property name="borderLeftWidth">thin</property>
                             <property name="borderBottomStyle">solid</property>
-                            <property name="borderBottomWidth">medium</property>
+                            <property name="borderBottomWidth">thin</property>
                             <property name="borderRightStyle">solid</property>
-                            <property name="borderRightWidth">medium</property>
+                            <property name="borderRightWidth">thin</property>
                             <property name="width">0.5625in</property>
                             <property name="content">
                                 <label id="296">
@@ -464,13 +464,13 @@ return false;]]></method>
                                                 </data>
                                             </property>
                                             <property name="borderTopStyle">solid</property>
-                                            <property name="borderTopWidth">medium</property>
+                                            <property name="borderTopWidth">thin</property>
                                             <property name="borderLeftStyle">solid</property>
-                                            <property name="borderLeftWidth">medium</property>
+                                            <property name="borderLeftWidth">thin</property>
                                             <property name="borderBottomStyle">solid</property>
-                                            <property name="borderBottomWidth">medium</property>
+                                            <property name="borderBottomWidth">thin</property>
                                             <property name="borderRightStyle">solid</property>
-                                            <property name="borderRightWidth">medium</property>
+                                            <property name="borderRightWidth">thin</property>
                                             <property name="width">0.5208333333333334in</property>
                                         </extended-item>
                                     </property>
@@ -503,13 +503,13 @@ return false;]]></method>
                                                 </label>
                                             </property>
                                             <property name="borderTopStyle">solid</property>
-                                            <property name="borderTopWidth">medium</property>
+                                            <property name="borderTopWidth">thin</property>
                                             <property name="borderLeftStyle">solid</property>
-                                            <property name="borderLeftWidth">medium</property>
+                                            <property name="borderLeftWidth">thin</property>
                                             <property name="borderBottomStyle">solid</property>
-                                            <property name="borderBottomWidth">medium</property>
+                                            <property name="borderBottomWidth">thin</property>
                                             <property name="borderRightStyle">solid</property>
-                                            <property name="borderRightWidth">medium</property>
+                                            <property name="borderRightWidth">thin</property>
                                             <property name="width">0.5416666666666666in</property>
                                         </extended-item>
                                     </property>
@@ -540,13 +540,13 @@ return false;]]></method>
                                                 </data>
                                             </property>
                                             <property name="borderTopStyle">solid</property>
-                                            <property name="borderTopWidth">medium</property>
+                                            <property name="borderTopWidth">thin</property>
                                             <property name="borderLeftStyle">solid</property>
-                                            <property name="borderLeftWidth">medium</property>
+                                            <property name="borderLeftWidth">thin</property>
                                             <property name="borderBottomStyle">solid</property>
-                                            <property name="borderBottomWidth">medium</property>
+                                            <property name="borderBottomWidth">thin</property>
                                             <property name="borderRightStyle">solid</property>
-                                            <property name="borderRightWidth">medium</property>
+                                            <property name="borderRightWidth">thin</property>
                                             <property name="width">16.447916666666668in</property>
                                         </extended-item>
                                     </property>

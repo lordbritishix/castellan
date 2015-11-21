@@ -1,9 +1,18 @@
 package com.jjdevbros.castellan.reportgenerator.generator;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Optional;
+import java.util.Stack;
+import java.util.stream.Collectors;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import com.jjdevbros.castellan.common.database.JsonGroupLookup;
 import com.jjdevbros.castellan.common.model.InactivePeriod;
 import com.jjdevbros.castellan.common.model.NormalizedEventId;
@@ -13,15 +22,6 @@ import com.jjdevbros.castellan.common.model.SessionPeriod;
 import com.jjdevbros.castellan.reportgenerator.report.UserReport;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Optional;
-import java.util.Stack;
-import java.util.stream.Collectors;
-
 /**
  * Created by lordbritishix on 05/09/15.
  *
@@ -30,10 +30,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserReportGenerator {
     private final JsonGroupLookup lookup;
+    private final long inactivityThresholdInSeconds;
 
     @Inject
-    public UserReportGenerator(JsonGroupLookup lookup) {
+    public UserReportGenerator(JsonGroupLookup lookup, @Named("inactive.threshold") long inactivityThresholdInSeconds) {
         this.lookup = lookup;
+        this.inactivityThresholdInSeconds = inactivityThresholdInSeconds;
     }
 
     public UserReport generateUserReport(String userName, NormalizedSession events, SessionPeriod period) {
@@ -44,10 +46,18 @@ public class UserReportGenerator {
                 .sourceEvents(events.getEvents().stream().map(e -> e.getEventModel()).collect(Collectors.toList()));
 
         List<String> errorDescriptions = Lists.newArrayList();
-        Optional<Instant> startTime = computeStartTime(events);
-        Optional<Instant> endTime = computeEndTime(events);
 
-        List<InactivePeriod> inactivePeriods = getInactivityActivityPeriods(events);
+        Optional<List<NormalizedEventModel>> inScopeEvents = getInScopeEvents(events.getEvents());
+
+        if (!inScopeEvents.isPresent()) {
+            errorDescriptions.add("Unable to find the start time or end time in the session");
+        }
+
+        Optional<Instant> startTime = computeStartTime(inScopeEvents.orElse(Lists.newArrayList()));
+        Optional<Instant> endTime = computeEndTime(inScopeEvents.orElse(Lists.newArrayList()));
+
+        List<InactivePeriod> inactivePeriods =
+                getInactivityActivityPeriods(inScopeEvents.orElse(Lists.newArrayList()), inactivityThresholdInSeconds);
         Optional<Duration> workDuration = Optional.empty();
 
         Duration inactivityDuration = computeInactivityDuration(inactivePeriods);
@@ -88,13 +98,38 @@ public class UserReportGenerator {
                 .build();
     }
 
+    @VisibleForTesting
+    /**
+     * In-scope events are events between the first active time and the last inactive time, inclusive
+     */
+    Optional<List<NormalizedEventModel>> getInScopeEvents(List<NormalizedEventModel> events) {
+        List<NormalizedEventModel> activeEvents = events.stream()
+                .filter(e -> e.getEventId().equals(NormalizedEventId.ACTIVE))
+                .sorted()
+                .collect(Collectors.toList());
+
+        List<NormalizedEventModel> inactiveEvents = events.stream()
+                .filter(e -> e.getEventId().equals(NormalizedEventId.INACTIVE))
+                .sorted()
+                .collect(Collectors.toList());
+
+        if ((activeEvents.size() <= 0) || (inactiveEvents.size() <= 0)) {
+            return Optional.empty();
+        }
+
+        NormalizedEventModel startEvent = activeEvents.get(0);
+        NormalizedEventModel endEvent = inactiveEvents.get(inactiveEvents.size() - 1);
+
+        return Optional.of(events.subList(events.indexOf(startEvent), events.indexOf(endEvent) + 1));
+    }
+
     /**
      * Start time: the first active event in the list of events
      * Returns -1 if there is no Active event in the list of events
      */
     @VisibleForTesting
-    Optional<Instant> computeStartTime(NormalizedSession session) {
-        return Optional.ofNullable(session.getEvents().stream()
+    Optional<Instant> computeStartTime(List<NormalizedEventModel> events) {
+        return Optional.ofNullable(events.stream()
                 .sorted()
                 .filter(e -> e.getEventId().equals(NormalizedEventId.ACTIVE))
                 .findFirst()
@@ -104,29 +139,25 @@ public class UserReportGenerator {
     }
 
     /**
-     * Time of the first "Inactive" event after the last "Active" event in the list of events
+     * Last inactive event. Active event must be present
      */
     @VisibleForTesting
-    Optional<Instant> computeEndTime(NormalizedSession events) {
-        List<NormalizedEventModel> baseEvents = events.getEvents().stream().sorted().collect(Collectors.toList());
-
-        List<NormalizedEventModel> activeEvents = baseEvents.stream()
-                .filter(e -> e.getEventId().equals(NormalizedEventId.ACTIVE))
-                .collect(Collectors.toList());
-
-        if (activeEvents.size() <= 0) {
+    Optional<Instant> computeEndTime(List<NormalizedEventModel> events) {
+        if (events.stream().filter(e -> e.getEventId().equals(NormalizedEventId.ACTIVE)).count() <= 0) {
             return Optional.empty();
         }
 
-        NormalizedEventModel lastEvent = activeEvents.get(activeEvents.size() - 1);
-
-        List<NormalizedEventModel> sublist = baseEvents.subList(baseEvents.indexOf(lastEvent), baseEvents.size());
-
-        return Optional.ofNullable(sublist.stream()
+        List<NormalizedEventModel> inactiveEvents = events.stream()
                 .filter(e -> e.getEventId().equals(NormalizedEventId.INACTIVE))
-                .findFirst()
-                .map(e -> Instant.ofEpochMilli(e.getEventModel().getTimestamp()))
-                .orElse(null));
+                .sorted()
+                .collect(Collectors.toList());
+
+        if (inactiveEvents.size() <= 0) {
+            return Optional.empty();
+        }
+
+        return Optional.of(
+                Instant.ofEpochMilli(inactiveEvents.get(inactiveEvents.size() - 1).getEventModel().getTimestamp()));
     }
 
     /**
@@ -136,16 +167,13 @@ public class UserReportGenerator {
      * after the active event
      */
     @VisibleForTesting
-    List<InactivePeriod> getInactivityActivityPeriods(NormalizedSession events) {
-        if (events.isHasErrors()) {
-            return ImmutableList.of();
-        }
-
+    List<InactivePeriod> getInactivityActivityPeriods(
+            List<NormalizedEventModel> events, long inactivityThresholdInSeconds) {
         List<InactivePeriod> inactivePeriods = Lists.newArrayList();
         Stack<NormalizedEventModel> stack = new Stack<>();
         boolean firstActiveFound = false;
 
-        for (NormalizedEventModel event : events.getEvents()) {
+        for (NormalizedEventModel event : events) {
             if (event.getEventId() == NormalizedEventId.ACTIVE) {
                 firstActiveFound = true;
             }
@@ -168,7 +196,10 @@ public class UserReportGenerator {
 
         }
 
-        return inactivePeriods;
+        return inactivePeriods.stream()
+                .filter(p -> p.getDuration().compareTo(
+                        Duration.of(inactivityThresholdInSeconds, ChronoUnit.SECONDS)) > 0)
+                .collect(Collectors.toList());
     }
 
     @VisibleForTesting

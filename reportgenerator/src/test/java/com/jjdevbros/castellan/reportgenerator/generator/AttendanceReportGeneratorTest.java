@@ -1,25 +1,24 @@
 package com.jjdevbros.castellan.reportgenerator.generator;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.jjdevbros.castellan.common.database.JsonGroupLookup;
 import com.jjdevbros.castellan.common.model.EventModel;
 import com.jjdevbros.castellan.common.model.SessionPeriod;
 import com.jjdevbros.castellan.common.model.WindowsLogEventId;
 import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
 import com.jjdevbros.castellan.reportgenerator.report.UserReport;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 /**
  * Created by lordbritishix on 06/09/15.
@@ -29,7 +28,73 @@ public class AttendanceReportGeneratorTest {
 
     @Before
     public void setup() {
-        fixture = new AttendanceReportGenerator(new UserReportGenerator(new JsonGroupLookup(null)));
+        fixture = new AttendanceReportGenerator(new UserReportGenerator(new JsonGroupLookup(null), 10), ImmutableSet.of("ExcludeMe"));
+    }
+
+    @Test
+    public void testInactivityThresholdExcludesExcludedEventFromComputation() {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-13T17:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-13T18:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-13T18:00:10.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-13T18:00:25.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-13T18:00:30.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-13T19:00:00.00Z", "Jim")
+        );
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 13), LocalDate.of(2015, 9, 13));
+
+        AttendanceReport attendanceReport = fixture.generateAttendanceReport(events, period);
+        List<UserReport> userReports =
+                getUserReportsForSingleDay(attendanceReport.getUserReports(), LocalDate.of(2015, 9, 13));
+
+        assertThat(userReports.size(), is(1));
+        assertThat(userReports.get(0).getInactivityDuration(), is(Duration.ofHours(0L)));
+        assertThat(userReports.get(0).getWorkDuration(),
+                is(Duration.between(Instant.parse("2015-09-13T17:00:00.00Z"),
+                                    Instant.parse("2015-09-13T19:00:00.00Z"))));
+        assertThat(userReports.get(0).getActivityDuration(),
+                is(Duration.between(Instant.parse("2015-09-13T17:00:00.00Z"),
+                        Instant.parse("2015-09-13T19:00:00.00Z"))));
+    }
+
+    @Test
+    public void testExcludeUserExcludesUserIfOnList1() {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-13T12:11:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-13T18:02:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-13T18:08:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-13T12:02:00.00Z", "ExcludeMe"),
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-13T18:02:00.00Z", "ExcludeMe")
+                );
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 13), LocalDate.of(2015, 9, 13));
+
+        AttendanceReport attendanceReport = fixture.generateAttendanceReport(events, period);
+        List<UserReport> userReports =
+                getUserReportsForSingleDay(attendanceReport.getUserReports(), LocalDate.of(2015, 9, 13));
+
+        assertThat(userReports.size(), is(1));
+        assertThat(userReports.get(0).getUserName(), is("Jim"));
+        assertThat(userReports.get(0).getInactivityDuration(), is(Duration.ofHours(0L)));
+        assertThat(userReports.get(0).getWorkDuration(),
+                is(Duration.between(Instant.parse("2015-09-13T18:02:00.00Z"), Instant.parse("2015-09-13T18:08:00.00Z"))));
+    }
+
+    @Test
+    public void testExcludeUserExcludesUserIfOnList2() {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-13T12:02:00.00Z", "ExcludeMe"),
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-13T18:02:00.00Z", "ExcludeMe")
+        );
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 13), LocalDate.of(2015, 9, 13));
+
+        AttendanceReport attendanceReport = fixture.generateAttendanceReport(events, period);
+        List<UserReport> userReports =
+                getUserReportsForSingleDay(attendanceReport.getUserReports(), LocalDate.of(2015, 9, 13));
+
+        assertTrue(userReports == null);
     }
 
     @Test
@@ -106,8 +171,8 @@ public class AttendanceReportGeneratorTest {
         List<UserReport> userReports =
                 getUserReportsForSingleDay(attendanceReport.getUserReports(), LocalDate.of(2015, 9, 2));
 
-        assertThat(userReports.get(0).getEndTime(), is(Instant.parse("2015-09-02T18:15:00.00Z")));
-        assertThat(userReports.get(0).getActivityDuration(), is(Duration.ofHours(10L)));
+        assertThat(userReports.get(0).getEndTime(), is(Instant.parse("2015-09-02T20:15:00.00Z")));
+        assertThat(userReports.get(0).getActivityDuration(), is(Duration.ofHours(12L)));
     }
 
 
@@ -129,7 +194,7 @@ public class AttendanceReportGeneratorTest {
     }
 
     @Test
-    public void generateAttendanceReportReturnsCorrectReportForEventsWithNoEndEvent() {
+    public void generateAttendanceReportReturnsCorrectReportForEventsWithEndEventNotLast() {
         List<EventModel> events = ImmutableList.of(
                 buildTestEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T08:15:40.00Z", "Jim"),
                 buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T10:15:40.00Z", "Jim"),
@@ -144,7 +209,10 @@ public class AttendanceReportGeneratorTest {
 
         List<UserReport> userReports =
                 getUserReportsForSingleDay(attendanceReport.getUserReports(), LocalDate.of(2015, 9, 2));
-        assertThat(userReports.get(0).isHasErrors(), is(true));
+        assertThat(userReports.get(0).isHasErrors(), is(false));
+        assertThat(userReports.get(0).getWorkDuration(), is(Duration.ofHours(2)));
+        assertThat(userReports.get(0).getActivityDuration(), is(Duration.ofHours(2)));
+        assertThat(userReports.get(0).getInactivityDuration(), is(Duration.ofHours(0)));
     }
 
     @Test
@@ -309,8 +377,7 @@ public class AttendanceReportGeneratorTest {
 
     private List<UserReport> getUserReportsForSingleDay(Map<SessionPeriod, List<UserReport>> reports,
                                                         LocalDate date) {
-        return reports.get(
-                new SessionPeriod(date, date));
+        return reports.get(new SessionPeriod(date, date));
     }
 
 

@@ -1,7 +1,9 @@
 {
-  "elastic.hostname": "52.1.142.197",
+  "elastic.hostname": "52.91.243.201",
   "elastic.port": 9300,
   "elastic.clustername": "elasticsearch",
+  "reporting.path": "/home/jim.quitevis/tmp",
+  "inactive.threshold": "60",
   "groups": {
     "Halifax": [
       "Jim",
@@ -12,5 +14,9 @@
       "Jeff",
       "Jacob"
     ]
-  }
+  },
+  "exclude": [
+    "Jim",
+    "Jane"
+  ]
 }

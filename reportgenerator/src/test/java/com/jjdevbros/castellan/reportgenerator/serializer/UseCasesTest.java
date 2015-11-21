@@ -1,6 +1,16 @@
 package com.jjdevbros.castellan.reportgenerator.serializer;
 
+import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.jjdevbros.castellan.common.database.JsonGroupLookup;
 import com.jjdevbros.castellan.common.model.EventModel;
 import com.jjdevbros.castellan.common.model.SessionPeriod;
@@ -9,16 +19,6 @@ import com.jjdevbros.castellan.reportgenerator.generator.AttendanceReportGenerat
 import com.jjdevbros.castellan.reportgenerator.generator.UserReportGenerator;
 import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
 import lombok.extern.slf4j.Slf4j;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -28,12 +28,38 @@ import static org.junit.Assert.assertThat;
  */
 @Slf4j
 public class UseCasesTest {
-    private AttendanceReportGenerator generator = new AttendanceReportGenerator(new UserReportGenerator(new JsonGroupLookup(null)));
+    private AttendanceReportGenerator generator =
+            new AttendanceReportGenerator(new UserReportGenerator(new JsonGroupLookup(null), 10), ImmutableSet.of());
     private JsonWriter fixture;
 
     @Before
     public void setup() {
         fixture = new JsonWriter();
+    }
+
+    @Test
+    public void testInactivityThresholdExcludesExcludedEventFromComputation() throws IOException {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-13T17:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-13T18:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-13T18:00:10.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-13T18:00:25.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_IN, "2015-09-13T18:00:30.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.LOG_OUT, "2015-09-13T19:00:00.00Z", "Jim")
+        );
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 13), LocalDate.of(2015, 9, 13));
+
+        JsonNode report = generateAttendanceReport(events, period);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
+
+        assertThat(userReport.get("userName").asText(), is("Jim"));
+        assertThat(userReport.get("startTime").asText(), is("09/13/15 5:00:00 PM"));
+        assertThat(userReport.get("endTime").asText(), is("09/13/15 7:00:00 PM"));
+        assertThat(userReport.get("inactivityDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("activityDuration").asText(), is("2:00:00"));
+        assertThat(userReport.get("workDuration").asText(), is("2:00:00"));
+        assertThat(userReport.get("inactivePeriods").size(), is(0));
     }
 
     @Test
@@ -186,7 +212,7 @@ public class UseCasesTest {
         JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
 
         assertThat(userReport.get("userName").asText(), is("Jim"));
-        assertThat(userReport.get("startTime").asText(), is("09/02/15 11:00:00 AM"));
+        assertThat(userReport.get("startTime").asText(), is(""));
         assertThat(userReport.get("endTime").asText(), is(""));
         assertThat(userReport.get("inactivityDuration").asText(), is("0:00:00"));
         assertThat(userReport.get("activityDuration").asText(), is("0:00:00"));
@@ -394,7 +420,7 @@ public class UseCasesTest {
         JsonNode report = generateAttendanceReport(events, period);
         JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
         assertThat(userReport.get("userName").asText(), is("Jim"));
-        assertThat(userReport.get("startTime").asText(), is("09/02/15 8:00:00 AM"));
+        assertThat(userReport.get("startTime").asText(), is(""));
         assertThat(userReport.get("endTime").asText(), is(""));
         assertThat(userReport.get("inactivityDuration").asText(), is("0:00:00"));
         assertThat(userReport.get("activityDuration").asText(), is("0:00:00"));
@@ -579,6 +605,84 @@ public class UseCasesTest {
         assertThat(userReport.get("workDuration").asText(), is("10:00:00"));
         assertThat(userReport.get("hasErrors").asBoolean(), is(false));
     }
+
+    @Test
+    public void testStartAndEndIsCorrectEvent1() throws IOException {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T02:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T08:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T10:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T12:00:00.00Z", "Jim")
+        );
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
+
+        JsonNode report = generateAttendanceReport(events, period);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
+        assertThat(userReport.get("userName").asText(), is("Jim"));
+        assertThat(userReport.get("startTime").asText(), is("09/02/15 8:00:00 AM"));
+        assertThat(userReport.get("endTime").asText(), is("09/02/15 10:00:00 AM"));
+        assertThat(userReport.get("inactivityDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("activityDuration").asText(), is("2:00:00"));
+        assertThat(userReport.get("workDuration").asText(), is("2:00:00"));
+        assertThat(userReport.get("hasErrors").asBoolean(), is(false));
+        assertThat(userReport.get("inactivePeriods").size(), is(0));
+    }
+
+    @Test
+    public void testStartAndEndIsCorrectEvent2() throws IOException {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T02:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T08:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T09:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T10:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T11:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T12:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T12:00:00.00Z", "Jim")
+        );
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
+
+        JsonNode report = generateAttendanceReport(events, period);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
+        assertThat(userReport.get("userName").asText(), is("Jim"));
+        assertThat(userReport.get("startTime").asText(), is("09/02/15 8:00:00 AM"));
+        assertThat(userReport.get("endTime").asText(), is("09/02/15 12:00:00 PM"));
+        assertThat(userReport.get("inactivityDuration").asText(), is("0:00:00"));
+        assertThat(userReport.get("activityDuration").asText(), is("4:00:00"));
+        assertThat(userReport.get("workDuration").asText(), is("4:00:00"));
+        assertThat(userReport.get("hasErrors").asBoolean(), is(false));
+        assertThat(userReport.get("inactivePeriods").size(), is(0));
+    }
+
+    @Test
+    public void testStartAndEndIsCorrectEvent3() throws IOException {
+        List<EventModel> events = ImmutableList.of(
+                buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T02:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T08:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T09:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T09:30:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T09:40:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T10:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T11:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T12:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T12:00:00.00Z", "Jim")
+        );
+
+        SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
+
+        JsonNode report = generateAttendanceReport(events, period);
+        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
+        assertThat(userReport.get("userName").asText(), is("Jim"));
+        assertThat(userReport.get("startTime").asText(), is("09/02/15 8:00:00 AM"));
+        assertThat(userReport.get("endTime").asText(), is("09/02/15 12:00:00 PM"));
+        assertThat(userReport.get("inactivityDuration").asText(), is("0:10:00"));
+        assertThat(userReport.get("activityDuration").asText(), is("3:50:00"));
+        assertThat(userReport.get("workDuration").asText(), is("4:00:00"));
+        assertThat(userReport.get("hasErrors").asBoolean(), is(false));
+        assertThat(userReport.get("inactivePeriods").size(), is(1));
+    }
+
 
     private JsonNode generateAttendanceReport(List<EventModel> events, SessionPeriod period) throws IOException {
         AttendanceReport attendanceReport = generator.generateAttendanceReport(events, period);

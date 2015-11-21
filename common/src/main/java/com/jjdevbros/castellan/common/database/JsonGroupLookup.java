@@ -16,7 +16,7 @@ public class JsonGroupLookup {
     private final JsonNode lookup;
 
     @Inject
-    public JsonGroupLookup(@Named("lookup.json") JsonNode lookup) {
+    public JsonGroupLookup(@Named("lookup.list") JsonNode lookup) {
         this.lookup = lookup;
     }
 
