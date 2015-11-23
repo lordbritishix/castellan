@@ -3,8 +3,6 @@ package com.jjdevbros.castellan.reportgenerator.renderer;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -119,9 +117,7 @@ public class ExcelFileRendererTest {
 
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
-        Path temp = Paths.get("/home/jim.quitevis/rep/");
-
-        boolean ret = renderer.write(createAttendanceReport(events, period), Files.createTempFile(temp, "daily_", ".pdf"),
+        boolean ret = renderer.write(createAttendanceReport(events, period), Files.createTempFile("daily_", ".pdf"),
                 new DailyReportSpecification());
         Assert.assertThat(ret, is(true));
     }
@@ -189,6 +185,18 @@ public class ExcelFileRendererTest {
 
             events.add(buildTestEvent(WindowsLogEventId.LOG_IN, start.toInstant(ZoneOffset.UTC), "James"));
             events.add(buildTestEvent(WindowsLogEventId.LOG_OUT, end.toInstant(ZoneOffset.UTC), "James"));
+
+            events.add(buildTestEvent(WindowsLogEventId.LOG_IN, start.toInstant(ZoneOffset.UTC), "Jeremy"));
+            events.add(buildTestEvent(WindowsLogEventId.LOG_OUT, end.toInstant(ZoneOffset.UTC), "Jeremy"));
+
+            events.add(buildTestEvent(WindowsLogEventId.LOG_IN, start.toInstant(ZoneOffset.UTC), "Jones"));
+            events.add(buildTestEvent(WindowsLogEventId.LOG_OUT, end.toInstant(ZoneOffset.UTC), "Jones"));
+
+            events.add(buildTestEvent(WindowsLogEventId.LOG_IN, start.toInstant(ZoneOffset.UTC), "Sean"));
+            events.add(buildTestEvent(WindowsLogEventId.LOG_OUT, end.toInstant(ZoneOffset.UTC), "Sean"));
+
+            events.add(buildTestEvent(WindowsLogEventId.LOG_IN, start.toInstant(ZoneOffset.UTC), "Carl"));
+            events.add(buildTestEvent(WindowsLogEventId.LOG_OUT, end.toInstant(ZoneOffset.UTC), "Carl"));
         }
 
         for (int x = 1; x < 31; ++x) {
@@ -206,9 +214,7 @@ public class ExcelFileRendererTest {
 
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 1), LocalDate.of(2015, 9, 30));
 
-        Path temp = Paths.get("/home/jim.quitevis/rep/");
-
-        boolean ret = renderer.write(createAttendanceReport(events, period), Files.createTempFile(temp, "monthly_", ".pdf"),
+        boolean ret = renderer.write(createAttendanceReport(events, period), Files.createTempFile("monthly_", ".pdf"),
                 new MonthlyReportSpecification());
 
         Assert.assertThat(ret, is(true));

@@ -168,7 +168,7 @@ public class UserReportGenerator {
      */
     @VisibleForTesting
     List<InactivePeriod> getInactivityActivityPeriods(
-            List<NormalizedEventModel> events, long inactivityThresholdInSeconds) {
+            List<NormalizedEventModel> events, long threshold) {
         List<InactivePeriod> inactivePeriods = Lists.newArrayList();
         Stack<NormalizedEventModel> stack = new Stack<>();
         boolean firstActiveFound = false;
@@ -198,7 +198,7 @@ public class UserReportGenerator {
 
         return inactivePeriods.stream()
                 .filter(p -> p.getDuration().compareTo(
-                        Duration.of(inactivityThresholdInSeconds, ChronoUnit.SECONDS)) > 0)
+                        Duration.of(threshold, ChronoUnit.SECONDS)) > 0)
                 .collect(Collectors.toList());
     }
 

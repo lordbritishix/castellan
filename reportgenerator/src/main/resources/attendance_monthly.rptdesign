@@ -355,7 +355,7 @@ return false;]]></method>
             <property name="type">custom</property>
             <property name="orientation">landscape</property>
             <property name="height">8.5in</property>
-            <property name="width">20in</property>
+            <property name="width">14in</property>
             <page-header>
                 <grid id="7">
                     <column id="8"/>
@@ -410,7 +410,7 @@ return false;]]></method>
                             <property name="borderBottomWidth">thin</property>
                             <property name="borderRightStyle">solid</property>
                             <property name="borderRightWidth">thin</property>
-                            <property name="width">0.5625in</property>
+                            <property name="width">0.4166666666666667in</property>
                             <property name="content">
                                 <label id="296">
                                     <property name="fontSize">xx-small</property>
@@ -471,7 +471,7 @@ return false;]]></method>
                                             <property name="borderBottomWidth">thin</property>
                                             <property name="borderRightStyle">solid</property>
                                             <property name="borderRightWidth">thin</property>
-                                            <property name="width">0.5208333333333334in</property>
+                                            <property name="width">0.4270833333333333in</property>
                                         </extended-item>
                                     </property>
                                 </extended-item>
@@ -510,7 +510,7 @@ return false;]]></method>
                                             <property name="borderBottomWidth">thin</property>
                                             <property name="borderRightStyle">solid</property>
                                             <property name="borderRightWidth">thin</property>
-                                            <property name="width">0.5416666666666666in</property>
+                                            <property name="width">0.4479166666666667in</property>
                                         </extended-item>
                                     </property>
                                 </extended-item>

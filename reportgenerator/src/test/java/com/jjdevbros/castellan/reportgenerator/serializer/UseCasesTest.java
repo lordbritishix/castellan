@@ -482,6 +482,9 @@ public class UseCasesTest {
 
     @Test
     public void testNotIdleRestartIdleWithLock() throws IOException {
+        generator =
+                new AttendanceReportGenerator(new UserReportGenerator(new JsonGroupLookup(null), 0), ImmutableSet.of());
+
         List<EventModel> events = ImmutableList.of(
                 buildTestEvent(WindowsLogEventId.SCREENSAVER_INACTIVE, "2015-09-02T08:00:00.00Z", "Jim"),
                 buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T08:00:00.00Z", "Jim"),
@@ -506,6 +509,9 @@ public class UseCasesTest {
 
     @Test
     public void testNotIdleIdleLock() throws IOException {
+        generator =
+                new AttendanceReportGenerator(new UserReportGenerator(new JsonGroupLookup(null), 0), ImmutableSet.of());
+
         List<EventModel> events = ImmutableList.of(
                 buildTestEvent(WindowsLogEventId.SCREENSAVER_INACTIVE, "2015-09-02T08:00:00.00Z", "Jim"),
                 buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T08:00:00.00Z", "Jim"),
