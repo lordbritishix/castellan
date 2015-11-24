@@ -1,0 +1,12 @@
+V1.1
+* Reduced console logging, redirected debug-level logging to a rotating file
+* A command line that creates an event for particular User (for recording my activity)
+* On the Server (Server config file?) how to setup sensitivity: time when the inactivity range is in the report (should be a variable, e.g. 10 min)
+* Include/exclude list of users on config file
+* Don't display user names that end with $
+* Command line daily for yesterday’s report; monthly for last month report
+* Report folder destination can now be changed via config file
+* START time ANY first event; END time – ANY the last event
+* In the daily reports, show Day of the week
+* Various report formatting issues
+

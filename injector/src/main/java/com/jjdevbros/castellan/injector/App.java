@@ -40,8 +40,8 @@ public class App {
         private String userName;
 
         @Parameter(names = {"-d"},
-                description = "Date / time on when the event occurs (in ISO 8601 format). "
-                            + "e.g. 2015-11-23T02:21:16+00:00. "
+                description = "Date / time on when the event occurs"
+                            + "e.g. 2015-11-23T02:21:16"
                             + "If not provided, then it uses the date / time today", required = false)
         @Getter
         private String dateTime;
