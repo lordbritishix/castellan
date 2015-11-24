@@ -8,7 +8,7 @@ import java.time.LocalDate;
  */
 public class Utils {
     public static String indexForDate(LocalDate date) {
-        return Constants.INDEX_PREFIX + Constants.INDEX_FORMATTER.format(Date.valueOf(date));
+        return Constants.INDEX_PREFIX + Constants.ES_INDEX_DATE_FORMATTER.format(Date.valueOf(date));
     }
 
 }

@@ -36,6 +36,20 @@ public enum WindowsLogEventId {
         this.tuple = tuple;
     }
 
+    public int getCode() {
+        return tuple.getRight();
+    }
+
+    public static WindowsLogEventId fromString(String eventName) {
+        for (WindowsLogEventId event : WindowsLogEventId.values()) {
+            if (event.tuple.getLeft().equalsIgnoreCase(eventName)) {
+                return event;
+            }
+        }
+
+        return  null;
+    }
+
     public static WindowsLogEventId fromEventId(int eventId) {
         for (WindowsLogEventId event : WindowsLogEventId.values()) {
             if (event.tuple.getRight() == eventId) {

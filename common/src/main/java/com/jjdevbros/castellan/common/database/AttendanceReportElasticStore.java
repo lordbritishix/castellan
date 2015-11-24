@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class AttendanceReportElasticStore implements AttendanceReportStore {
-    private static final String TYPE = "eventlog";
     private static final int PAGE_SIZE = 100;
     private static final int PAGE_TIMEOUT = 60000;
 
@@ -66,7 +65,7 @@ public class AttendanceReportElasticStore implements AttendanceReportStore {
         List<EventModel> events = Lists.newArrayList();
         final SearchHitToEventModelSerializer serializer = new SearchHitToEventModelSerializer();
 
-        log.info("Fetching records");
+        log.debug("Fetching records");
 
         while (true) {
             List<SearchHit> hits = Arrays.asList(response.getHits().getHits());
@@ -86,14 +85,14 @@ public class AttendanceReportElasticStore implements AttendanceReportStore {
             int hitsLength = response.getHits().getHits().length;
 
             if (hitsLength <= 0) {
-                log.info("No more records found for this session");
+                log.debug("No more records found for this session");
                 break;
             }
 
-            log.info("Found records for this page: {}", hitsLength);
+            log.debug("Found records for this page: {}", hitsLength);
         }
 
-        log.info("Done fetching records");
+        log.debug("Done fetching records");
 
         return  events;
     }

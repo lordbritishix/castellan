@@ -2,8 +2,6 @@ package com.jjdevbros.castellan.console;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ExecutionException;
@@ -18,6 +16,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.jjdevbros.castellan.common.guice.AttendanceReportModule;
 import com.jjdevbros.castellan.common.model.SessionType;
 import com.jjdevbros.castellan.reportgenerator.ReportGenerator;
 import lombok.Getter;
@@ -71,7 +70,7 @@ public class App {
         LogManager.getLogManager().reset();
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
-        Logger.getLogger("global").setLevel(Level.WARNING);
+        Logger.getLogger("global").setLevel(Level.INFO);
 
         JCommander jc = new JCommander(params);
         jc.setDefaultProvider(DEFAULT_PROVIDER);
@@ -90,24 +89,19 @@ public class App {
         Injector injector = Guice.createInjector(new AttendanceReportModule(params.getConfigFile()));
         ReportGenerator generator = injector.getInstance(ReportGenerator.class);
 
-        Instant now = Instant.now();
         Path path;
 
         String p = jc.getParsedCommand();
 
         if (p.equals("monthly")) {
             LocalDate dateParam = LocalDate.parse(monthlyReport.from).withDayOfMonth(1);
-            System.out.println("Generating monthly report for reporting period: " + dateParam.toString());
+            log.info("Generating monthly report for reporting period: {}", dateParam.toString());
             path = generator.generateReport(dateParam, SessionType.MONTHLY);
-            System.out.println("Report generated! Elapsed time: "
-                    + Duration.between(now, Instant.now()).toMillis() + " ms");
         }
         else if (p.equals("daily")) {
             LocalDate dateParam = LocalDate.parse(dailyReport.from);
-            System.out.println("Generating daily report for reporting period: " + dateParam.toString());
+            log.info("Generating daily report for reporting period: {}", dateParam.toString());
             path = generator.generateReport(dateParam, SessionType.DAILY);
-            System.out.println("Report generated! Elapsed time: "
-                    + Duration.between(now, Instant.now()).toMillis() + " ms");
         }
         else {
             log.error("Invalid report type provided.");
@@ -116,10 +110,10 @@ public class App {
         }
 
         if (path != null) {
-            System.out.println("Report is at: " + path.toString());
+            log.info("Report is at: {}", path.toString());
         }
         else {
-            System.out.println("Nothing to generate!");
+            log.info("Nothing to generate!");
         }
     }
 }

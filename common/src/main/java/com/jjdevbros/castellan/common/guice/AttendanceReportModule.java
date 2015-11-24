@@ -1,11 +1,11 @@
-package com.jjdevbros.castellan.console;
+package com.jjdevbros.castellan.common.guice;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Set;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import com.beust.jcommander.internal.Sets;
+import com.google.common.collect.Sets;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
@@ -39,6 +39,8 @@ public class AttendanceReportModule implements Module {
     private void bindSettings(Binder binder) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode lookup = mapper.readTree(Paths.get(configFile).toFile());
+
+        log.debug("Dumping settings: {}", lookup.toString());
 
         binder.bindConstant().annotatedWith(
                 Names.named("elastic.hostname")).to(lookup.get("elastic.hostname").asText());

@@ -21,5 +21,7 @@ public final class Constants {
 
     public static final String EN_DASH = "–";
     public static final String INDEX_PREFIX = "nxlog-";
-    public static final SimpleDateFormat INDEX_FORMATTER = new SimpleDateFormat("YYYYMMdd");
+    public static final SimpleDateFormat ES_INDEX_DATE_FORMATTER = new SimpleDateFormat("YYYYMMdd");
+    public static final SimpleDateFormat ES_EVENT_DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public static final String ES_TYPE = "eventlog";
 }

@@ -15,7 +15,7 @@
                    value="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n"/>
         </layout>
     </appender>
-    <logger name="com.jjdevbros.castellan.console">
+    <logger name="com.jjdevbros.castellan.injector">
         <level value="Info"/>
         <appender-ref ref="Console"/>
     </logger>

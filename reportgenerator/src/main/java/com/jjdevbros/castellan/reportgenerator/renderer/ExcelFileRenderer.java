@@ -24,6 +24,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Created by lordbritishix on 06/09/15.
@@ -42,7 +43,7 @@ public class ExcelFileRenderer {
             return false;
         }
 
-        log.info("Generating report: " + outputPath.toString());
+        log.debug("Generating report: " + outputPath.toString());
         List<?> errors = Lists.newArrayList();
 
         byte[] data = null;
@@ -53,9 +54,10 @@ public class ExcelFileRenderer {
             Path jsonOutput = Files.createTempFile(specification.getFileNamePrefix() + "_", ".json");
             jsonFileRenderer.write(report, jsonOutput);
 
-            log.info("Reading data source from: " + jsonOutput);
+            log.debug("Reading data source from: " + jsonOutput);
 
             EngineConfig config = new EngineConfig();
+            config.setLogConfig(null, Level.WARNING);
             Platform.startup(config);
             IReportEngineFactory factory = (IReportEngineFactory) Platform.createFactoryObject(
                     IReportEngineFactory.EXTENSION_REPORT_ENGINE_FACTORY);
@@ -83,7 +85,7 @@ public class ExcelFileRenderer {
 
             data = baos.toByteArray();
 
-            log.info("Generating report complete with duration: " + runDuration.toString());
+            log.debug("Generating report complete with duration: " + runDuration.toString());
         } catch (BirtException e) {
             log.error("An error was encountered while generating the report", e);
             throw e;
