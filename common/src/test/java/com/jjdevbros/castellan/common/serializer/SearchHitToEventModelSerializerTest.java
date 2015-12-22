@@ -62,7 +62,7 @@ public class SearchHitToEventModelSerializerTest {
 
         assertThat(model.getEventId(), is(WindowsLogEventId.LOG_IN));
         assertThat(model.getHostName(), is("IE11Win7"));
-        assertThat(model.getUserName(), is("IEUser"));
+        assertThat(model.getUserName(), is("ieuser"));
         assertThat(model.getTimestamp(), is(timestamp));
     }
 
@@ -77,7 +77,7 @@ public class SearchHitToEventModelSerializerTest {
 
         assertThat(model.getEventId(), is(WindowsLogEventId.LOG_OUT));
         assertThat(model.getHostName(), is("IE11Win7"));
-        assertThat(model.getUserName(), is("IEUser"));
+        assertThat(model.getUserName(), is("ieuser"));
         assertThat(model.getTimestamp(), is(timestamp));
     }
 
@@ -91,7 +91,7 @@ public class SearchHitToEventModelSerializerTest {
 
         assertThat(model.getEventId(), is(WindowsLogEventId.SCREENSAVER_INACTIVE));
         assertThat(model.getHostName(), is("IE11Win7"));
-        assertThat(model.getUserName(), is("IEUser"));
+        assertThat(model.getUserName(), is("ieuser"));
         assertThat(model.getTimestamp(), is(timestamp));
     }
 
@@ -105,7 +105,7 @@ public class SearchHitToEventModelSerializerTest {
 
         assertThat(model.getEventId(), is(WindowsLogEventId.SCREENSAVER_ACTIVE));
         assertThat(model.getHostName(), is("IE11Win7"));
-        assertThat(model.getUserName(), is("IEUser"));
+        assertThat(model.getUserName(), is("ieuser"));
         assertThat(model.getTimestamp(), is(timestamp));
     }
 
@@ -119,7 +119,7 @@ public class SearchHitToEventModelSerializerTest {
 
         assertThat(model.getEventId(), is(WindowsLogEventId.SCREEN_LOCK));
         assertThat(model.getHostName(), is("IE11Win7"));
-        assertThat(model.getUserName(), is("IEUser"));
+        assertThat(model.getUserName(), is("ieuser"));
         assertThat(model.getTimestamp(), is(timestamp));
     }
 
@@ -133,7 +133,7 @@ public class SearchHitToEventModelSerializerTest {
 
         assertThat(model.getEventId(), is(WindowsLogEventId.SCREEN_UNLOCK));
         assertThat(model.getHostName(), is("IE11Win7"));
-        assertThat(model.getUserName(), is("IEUser"));
+        assertThat(model.getUserName(), is("ieuser"));
         assertThat(model.getTimestamp(), is(timestamp));
     }
 

@@ -1,13 +1,5 @@
 package com.jjdevbros.castellan.reportgenerator.generator;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.jjdevbros.castellan.common.database.JsonGroupLookup;
@@ -16,6 +8,15 @@ import com.jjdevbros.castellan.common.model.SessionPeriod;
 import com.jjdevbros.castellan.common.model.WindowsLogEventId;
 import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
 import com.jjdevbros.castellan.reportgenerator.report.UserReport;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -186,11 +187,7 @@ public class AttendanceReportGeneratorTest {
 
         AttendanceReport attendanceReport = fixture.generateAttendanceReport(events, period);
 
-        assertThat(attendanceReport.getUserReports().size(), is(1));
-
-        List<UserReport> userReports =
-                getUserReportsForSingleDay(attendanceReport.getUserReports(), LocalDate.of(2015, 9, 2));
-        assertThat(userReports.get(0).isHasErrors(), is(true));
+        assertThat(attendanceReport.getUserReports().size(), is(0));
     }
 
     @Test

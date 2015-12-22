@@ -32,7 +32,8 @@ public class SearchHitToEventModelSerializer {
         return EventModel.builder()
                 .hostName(hit.get("Hostname").toString())
                 .eventId(WindowsLogEventId.fromEventId(Integer.parseInt(hit.get("EventID").toString())))
-                .userName(Optional.ofNullable(hit.get("TargetUserName")).orElse(hit.get("UserID")).toString())
+                .userName(Optional.ofNullable(hit.get("TargetUserName"))
+                        .orElse(hit.get("UserID")).toString().toLowerCase())
                 .timestamp(
                         DF.parse(hit.get("EventTime").toString()).toInstant().toEpochMilli())
                 .build();

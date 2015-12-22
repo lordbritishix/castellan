@@ -72,7 +72,7 @@ public class AttendanceReportElasticStore implements AttendanceReportStore {
 
             events.addAll(hits.stream().map(hit -> {
                 try {
-                    log.trace(hit.getSourceAsString());
+                    log.debug(hit.getSourceAsString());
                     return serializer.serialize(hit);
                 } catch (ParseException e) {
                     throw new RuntimeException(e);

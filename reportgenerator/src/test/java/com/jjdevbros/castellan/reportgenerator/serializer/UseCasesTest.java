@@ -1,14 +1,5 @@
 package com.jjdevbros.castellan.reportgenerator.serializer;
 
-import java.io.IOException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.List;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.jjdevbros.castellan.common.database.JsonGroupLookup;
@@ -19,6 +10,16 @@ import com.jjdevbros.castellan.reportgenerator.generator.AttendanceReportGenerat
 import com.jjdevbros.castellan.reportgenerator.generator.UserReportGenerator;
 import com.jjdevbros.castellan.reportgenerator.report.AttendanceReport;
 import lombok.extern.slf4j.Slf4j;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -209,16 +210,8 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
+        assertThat(report.get("userReports").get(0).get("report").size(), is(0));
 
-        assertThat(userReport.get("userName").asText(), is("Jim"));
-        assertThat(userReport.get("startTime").asText(), is(""));
-        assertThat(userReport.get("endTime").asText(), is(""));
-        assertThat(userReport.get("inactivityDuration").asText(), is("0:00:00"));
-        assertThat(userReport.get("activityDuration").asText(), is("0:00:00"));
-        assertThat(userReport.get("workDuration").asText(), is("0:00:00"));
-        assertThat(userReport.get("inactivePeriods").size(), is(0));
-        assertThat(userReport.get("hasErrors").asBoolean(), is(true));
     }
 
     @Test
@@ -397,15 +390,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
-        assertThat(userReport.get("userName").asText(), is("Jim"));
-        assertThat(userReport.get("startTime").asText(), is(""));
-        assertThat(userReport.get("endTime").asText(), is(""));
-        assertThat(userReport.get("inactivityDuration").asText(), is("0:00:00"));
-        assertThat(userReport.get("activityDuration").asText(), is("0:00:00"));
-        assertThat(userReport.get("workDuration").asText(), is("0:00:00"));
-        assertThat(userReport.get("hasErrors").asBoolean(), is(true));
-        assertThat(userReport.get("inactivePeriods").size(), is(0));
+        assertThat(report.get("userReports").get(0).get("report").size(), is(0));
     }
 
     @Test
@@ -418,15 +403,7 @@ public class UseCasesTest {
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
 
         JsonNode report = generateAttendanceReport(events, period);
-        JsonNode userReport = report.get("userReports").get(0).get("report").get(0);
-        assertThat(userReport.get("userName").asText(), is("Jim"));
-        assertThat(userReport.get("startTime").asText(), is(""));
-        assertThat(userReport.get("endTime").asText(), is(""));
-        assertThat(userReport.get("inactivityDuration").asText(), is("0:00:00"));
-        assertThat(userReport.get("activityDuration").asText(), is("0:00:00"));
-        assertThat(userReport.get("workDuration").asText(), is("0:00:00"));
-        assertThat(userReport.get("hasErrors").asBoolean(), is(true));
-        assertThat(userReport.get("inactivePeriods").size(), is(0));
+        assertThat(report.get("userReports").get(0).get("report").size(), is(0));
     }
 
     @Test

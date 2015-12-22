@@ -13,4 +13,8 @@ public abstract class ReportSpecification {
 
     @Getter
     private String fileNamePrefix;
+
+    public String getFileNamePrefix() {
+        return fileNamePrefix;
+    }
 }

@@ -3,14 +3,15 @@
     <groupId>com.jjdevbros</groupId>
     <artifactId>castellan</artifactId>
     <packaging>pom</packaging>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
     <name>castellan</name>
     <url>git@bitbucket.org:lordbritishix/castellan.gitgit</url>
     <scm>
         <connection>scm:git:ssh://git@bitbucket.org/jjdevelopmentbros/castellan.git</connection>
         <developerConnection>scm:git:ssh://git@bitbucket.org/jjdevelopmentbros/castellan.git</developerConnection>
         <url>https://bitbucket.org/jjdevelopmentbros/castellan.git</url>
-    </scm>
+      <tag>HEAD</tag>
+  </scm>
 
     <properties>
         <junit.version>4.9</junit.version>
@@ -23,8 +24,8 @@
         <poi.version>3.12</poi.version>
         <jcommander.version>1.48</jcommander.version>
         <commons.lang3.version>3.4</commons.lang3.version>
-        <reportgenerator.version>${project.parent.version}</reportgenerator.version>
-        <common.version>${project.parent.version}</common.version>
+        <reportgenerator.version>1.2-SNAPSHOT</reportgenerator.version>
+        <common.version>1.2-SNAPSHOT</common.version>
         <guice.version>4.0</guice.version>
         <elasticsearch.version>1.7.1</elasticsearch.version>
         <jackson-mapper-asl.version>1.9.13</jackson-mapper-asl.version>
