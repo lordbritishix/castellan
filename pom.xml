@@ -3,7 +3,7 @@
     <groupId>com.jjdevbros</groupId>
     <artifactId>castellan</artifactId>
     <packaging>pom</packaging>
-    <version>1.3</version>
+    <version>1.4-SNAPSHOT</version>
     <name>castellan</name>
     <url>https://github.com/lordbritishix/castellan</url>
     <scm>
