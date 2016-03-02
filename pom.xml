@@ -5,10 +5,10 @@
     <packaging>pom</packaging>
     <version>1.2-SNAPSHOT</version>
     <name>castellan</name>
-    <url>git@bitbucket.org:lordbritishix/castellan.gitgit</url>
+    <url>https://github.com/lordbritishix/castellan</url>
     <scm>
-        <connection>scm:git:ssh://git@github.com:lordbritishix/castellan.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com:lordbritishix/castellan.git</developerConnection>
+        <connection>scm:git:ssh://git@github.com/lordbritishix/castellan.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/lordbritishix/castellan.git</developerConnection>
         <url>https://github.com/lordbritishix/castellan</url>
       <tag>HEAD</tag>
   </scm>
