@@ -616,12 +616,12 @@ public class UseCasesTest {
     public void testStartAndEndIsCorrectEvent2() throws IOException {
         List<EventModel> events = ImmutableList.of(
                 buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T02:00:00.00Z", "Jim"),
-                buildTestEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T08:00:00.00Z", "Jim"),
-                buildTestEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T09:00:00.00Z", "Jim"),
                 buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T10:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T09:00:00.00Z", "Jim"),
                 buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T11:00:00.00Z", "Jim"),
+                buildTestEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T12:00:00.00Z", "Jim"),
                 buildTestEvent(WindowsLogEventId.SCREEN_LOCK, "2015-09-02T12:00:00.00Z", "Jim"),
-                buildTestEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T12:00:00.00Z", "Jim")
+                buildTestEvent(WindowsLogEventId.SCREEN_UNLOCK, "2015-09-02T08:00:00.00Z", "Jim")
         );
 
         SessionPeriod period = new SessionPeriod(LocalDate.of(2015, 9, 2), LocalDate.of(2015, 9, 2));
@@ -631,11 +631,11 @@ public class UseCasesTest {
         assertThat(userReport.get("userName").asText(), is("Jim"));
         assertThat(userReport.get("startTime").asText(), is("09/02/15 8:00:00 AM"));
         assertThat(userReport.get("endTime").asText(), is("09/02/15 12:00:00 PM"));
-        assertThat(userReport.get("inactivityDuration").asText(), is("0:00:00"));
-        assertThat(userReport.get("activityDuration").asText(), is("4:00:00"));
+        assertThat(userReport.get("inactivityDuration").asText(), is("2:00:00"));
+        assertThat(userReport.get("activityDuration").asText(), is("2:00:00"));
         assertThat(userReport.get("workDuration").asText(), is("4:00:00"));
         assertThat(userReport.get("hasErrors").asBoolean(), is(false));
-        assertThat(userReport.get("inactivePeriods").size(), is(0));
+        assertThat(userReport.get("inactivePeriods").size(), is(1));
     }
 
     @Test
@@ -659,11 +659,11 @@ public class UseCasesTest {
         assertThat(userReport.get("userName").asText(), is("Jim"));
         assertThat(userReport.get("startTime").asText(), is("09/02/15 8:00:00 AM"));
         assertThat(userReport.get("endTime").asText(), is("09/02/15 12:00:00 PM"));
-        assertThat(userReport.get("inactivityDuration").asText(), is("0:10:00"));
-        assertThat(userReport.get("activityDuration").asText(), is("3:50:00"));
+        assertThat(userReport.get("inactivityDuration").asText(), is("2:10:00"));
+        assertThat(userReport.get("activityDuration").asText(), is("1:50:00"));
         assertThat(userReport.get("workDuration").asText(), is("4:00:00"));
         assertThat(userReport.get("hasErrors").asBoolean(), is(false));
-        assertThat(userReport.get("inactivePeriods").size(), is(1));
+        assertThat(userReport.get("inactivePeriods").size(), is(2));
     }
 
 

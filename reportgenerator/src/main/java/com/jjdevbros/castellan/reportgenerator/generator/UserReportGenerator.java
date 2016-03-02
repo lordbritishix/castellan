@@ -1,14 +1,5 @@
 package com.jjdevbros.castellan.reportgenerator.generator;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Optional;
-import java.util.Stack;
-import java.util.stream.Collectors;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -20,6 +11,16 @@ import com.jjdevbros.castellan.common.model.NormalizedEventModel;
 import com.jjdevbros.castellan.common.model.NormalizedSession;
 import com.jjdevbros.castellan.common.model.SessionPeriod;
 import com.jjdevbros.castellan.reportgenerator.report.UserReport;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Optional;
+import java.util.Stack;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -120,7 +121,11 @@ public class UserReportGenerator {
         NormalizedEventModel startEvent = activeEvents.get(0);
         NormalizedEventModel endEvent = inactiveEvents.get(inactiveEvents.size() - 1);
 
-        return Optional.of(events.subList(events.indexOf(startEvent), events.indexOf(endEvent) + 1));
+        return Optional.of(events.stream()
+                .filter(
+                    p -> p.getEventModel().getTimestamp() >= startEvent.getEventModel().getTimestamp()
+                    && p.getEventModel().getTimestamp() <= endEvent.getEventModel().getTimestamp())
+                .collect(Collectors.toList()));
     }
 
     /**

@@ -110,9 +110,9 @@ public class UserReportGeneratorTest {
     @Test
     public void testGetInScopeEventsForHappyCase1() {
         List<NormalizedEventModel> events = Lists.newArrayList();
-        events.add(buildTestEvent(Instant.parse("2015-09-02T08:15:30.00Z").toEpochMilli(), NormalizedEventId.ACTIVE));
         events.add(buildTestEvent(Instant.parse("2015-09-02T10:15:30.00Z").toEpochMilli(), NormalizedEventId.INACTIVE));
         events.add(buildTestEvent(Instant.parse("2015-09-02T12:15:30.00Z").toEpochMilli(), NormalizedEventId.ACTIVE));
+        events.add(buildTestEvent(Instant.parse("2015-09-02T08:15:30.00Z").toEpochMilli(), NormalizedEventId.ACTIVE));
         events.add(buildTestEvent(Instant.parse("2015-09-02T14:15:30.00Z").toEpochMilli(), NormalizedEventId.INACTIVE));
 
         List<NormalizedEventModel> inScopeEvents = fixture.getInScopeEvents(events).get();
