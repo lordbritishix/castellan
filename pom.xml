@@ -7,9 +7,9 @@
     <name>castellan</name>
     <url>git@bitbucket.org:lordbritishix/castellan.gitgit</url>
     <scm>
-        <connection>scm:git:ssh://git@bitbucket.org/jjdevelopmentbros/castellan.git</connection>
-        <developerConnection>scm:git:ssh://git@bitbucket.org/jjdevelopmentbros/castellan.git</developerConnection>
-        <url>https://bitbucket.org/jjdevelopmentbros/castellan.git</url>
+        <connection>scm:git:ssh://git@github.com:lordbritishix/castellan.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:lordbritishix/castellan.git</developerConnection>
+        <url>https://github.com/lordbritishix/castellan</url>
       <tag>HEAD</tag>
   </scm>
 
