@@ -83,10 +83,11 @@ public class UserReportGenerator {
         }
 
         if (errorDescriptions.size() > 0) {
+            String errors = errorDescriptions.stream().collect(Collectors.joining("; "));
             builder.hasErrors(true);
-            builder.errorDescription(errorDescriptions.stream().collect(Collectors.joining("; ")));
-            log.error("Unable to generate user report for user: {} for events {} for period {}",
-                        userName, events, period.toString());
+            builder.errorDescription(errors);
+            log.error("Unable to generate user report for user: {} for events {} for period {} with errors {}",
+                        userName, events, period.toString(), errors);
         }
 
         return builder
